@@ -84,7 +84,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       <section className="sec-tight !pt-4" aria-label={dict.profile.title}>
         <div className="wrap grid grid-cols-1 gap-[clamp(12px,1.6vw,20px)] md:grid-cols-6">
           <article className="tile rv md:col-span-4">
-            <p className="kicker">About</p>
+            <p className="kicker">{dict.home.sections.about}</p>
             <p className="body !text-[clamp(17px,1.5vw,19px)]">{tx(profile.intro, locale)}</p>
             <p className="body mt-5 !text-[clamp(17px,1.5vw,19px)]">{tx(profile.now, locale)}</p>
           </article>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { profile } from "@/content/profile";
-import type { Locale } from "@/i18n/config";
+import { otherLocale, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { mailto } from "@/lib/site";
 import { CopyEmail } from "./copy-email";
@@ -35,7 +35,7 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
       <div className="border-t border-line">
         <div className="wrap flex flex-col gap-4 py-8 text-sm text-muted-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="m-0 font-semibold">
-            © {new Date().getFullYear()} {dict.footer.rights}
+            © {new Date().getFullYear()} {profile.name[locale]} · <span lang={otherLocale(locale)}>{profile.altName[locale]}</span>
           </p>
           <div className="flex flex-wrap items-center gap-x-5 font-semibold">
             <Link href={`/${locale}/profile`} className="inline-flex min-h-10 items-center hover:text-ink">

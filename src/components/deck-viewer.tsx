@@ -74,6 +74,13 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
   const onDialogClose = () => {
     document.documentElement.style.overflow = "";
   };
+  // 창이 열린 채 페이지를 떠나면(뒤로 가기 등) close 이벤트 없이 dialog 가 사라진다 — 스크롤 잠금을 여기서도 푼다.
+  useEffect(
+    () => () => {
+      document.documentElement.style.overflow = "";
+    },
+    [],
+  );
 
   const slideLabel = (n: number) => labels.slideOf.replace("{n}", String(n));
   const summary = labels.allSlides

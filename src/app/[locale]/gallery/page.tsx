@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/gallery"
   return pageMetadata(locale, "/gallery", {
     title: dict.gallery.titleLocal,
     description: dict.gallery.lead,
-    image: og ? { url: og.src, width: og.width, height: og.height, alt: dict.gallery.titleLocal } : { ...DEFAULT_OG },
+    image: og ? { url: og.src, width: og.width, height: og.height, alt: dict.gallery.titleLocal } : { ...DEFAULT_OG[locale] },
   });
 }
 

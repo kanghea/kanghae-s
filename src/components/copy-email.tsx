@@ -14,7 +14,8 @@ export function CopyEmail({ email, label, done, className = "btn-ghost" }: { ema
     try {
       await navigator.clipboard.writeText(email);
     } catch {
-      // 클립보드 권한이 없으면 선택 범위로 대신 복사
+      // 클립보드 권한이 없으면 선택 범위로 대신 복사 — 선택이 포커스를 가져가므로 끝나면 버튼으로 돌려준다.
+      const back = document.activeElement as HTMLElement | null;
       const ta = document.createElement("textarea");
       ta.value = email;
       ta.setAttribute("readonly", "");
@@ -24,6 +25,7 @@ export function CopyEmail({ email, label, done, className = "btn-ghost" }: { ema
       ta.select();
       document.execCommand("copy");
       ta.remove();
+      back?.focus({ preventScroll: true });
     }
     setCopied(true);
     if (timer.current) clearTimeout(timer.current);

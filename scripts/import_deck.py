@@ -173,17 +173,22 @@ def render_with_libreoffice(pptx: Path, tmp: Path, preview: list[int], width: in
 
 
 def og_image(img: Image.Image) -> Image.Image:
-    """공유 미리보기용 1200×630 — 폭을 맞춘 뒤 위아래를 가운데 기준으로 자른다."""
+    """공유 미리보기용 1200×630 — 자르지 않고 슬라이드 전체를 담는다(가장자리 캡션이 잘리지 않게).
+    남는 띠는 슬라이드 가장자리 1px 을 늘여 채워 바탕이 이어져 보이게 한다."""
     w, h = 1200, 630
-    scaled_h = round(w * img.height / img.width)
-    if scaled_h < h:  # 16:9 보다 납작한 덱 — 높이를 맞추고 좌우를 자른다
-        scaled_w = round(h * img.width / img.height)
-        tmp = img.resize((scaled_w, h), Image.Resampling.LANCZOS)
-        left = (scaled_w - w) // 2
-        return tmp.crop((left, 0, left + w, h))
-    tmp = img.resize((w, scaled_h), Image.Resampling.LANCZOS)
-    top = (scaled_h - h) // 2
-    return tmp.crop((0, top, w, top + h))
+    scale = min(w / img.width, h / img.height)
+    sw, sh = round(img.width * scale), round(img.height * scale)
+    tmp = img.convert("RGB").resize((sw, sh), Image.Resampling.LANCZOS)
+    canvas = Image.new("RGB", (w, h))
+    x, y = (w - sw) // 2, (h - sh) // 2
+    canvas.paste(tmp, (x, y))
+    if x:
+        canvas.paste(tmp.crop((0, 0, 1, sh)).resize((x, sh)), (0, y))
+        canvas.paste(tmp.crop((sw - 1, 0, sw, sh)).resize((w - x - sw, sh)), (x + sw, y))
+    if y:
+        canvas.paste(tmp.crop((0, 0, sw, 1)).resize((sw, y)), (x, 0))
+        canvas.paste(tmp.crop((0, sh - 1, sw, sh)).resize((sw, h - y - sh)), (x, y + sh))
+    return canvas
 
 
 def veil_data_url(img: Image.Image) -> str:

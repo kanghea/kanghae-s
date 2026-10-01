@@ -6,7 +6,11 @@ import type { SitePath } from "./site";
 
 const ogLocale: Record<Locale, string> = { ko: "ko_KR", en: "en_US" };
 
-export const DEFAULT_OG = { url: "/og.jpg", width: 1200, height: 630 };
+/** 기본 공유 이미지 — 언어별로 문구가 다르다(영어판 미리보기에 한글 문구가 뜨지 않게). */
+export const DEFAULT_OG: Record<Locale, { url: string; width: number; height: number }> = {
+  ko: { url: "/og.jpg", width: 1200, height: 630 },
+  en: { url: "/og-en.jpg", width: 1200, height: 630 },
+};
 
 type Options = {
   title: string;
@@ -22,7 +26,7 @@ export function pageMetadata(locale: Locale, path: SitePath, opts: Options): Met
   const languages = Object.fromEntries(locales.map((l) => [l, `/${l}${path}`])) as Record<string, string>;
   // 언어를 모르는 방문자: 홈은 '/'(브라우저 언어로 나눈다), 나머지는 영어판.
   languages["x-default"] = path === "" ? "/" : `/en${path}`;
-  const image = opts.image ?? { ...DEFAULT_OG, alt: dict.meta.title };
+  const image = opts.image ?? { ...DEFAULT_OG[locale], alt: dict.meta.title };
   // 공유 미리보기(카카오톡 · 링크드인)에도 이름이 보이게 — <title> 템플릿은 OG 에 적용되지 않는다.
   const shareTitle = opts.absoluteTitle ? opts.title : `${opts.title} — ${profile.name[locale]}`;
   return {

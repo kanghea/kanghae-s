@@ -1171,6 +1171,11 @@
     .glow {
       display: none !important;
     }
+    /* 스크롤하지 않은 채 인쇄 · PDF 저장해도 아직 등장하지 않은 단락이 빠지지 않게 */
+    html.rv-ready .rv:not(.on) {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }
 

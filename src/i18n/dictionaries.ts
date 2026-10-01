@@ -27,7 +27,7 @@ const ko = {
       about: "자기소개",
       education: "학력",
       experience: "경력 · 활동",
-      awards: "수상",
+      awards: "수상 · 대회",
       projects: "프로젝트",
       decks: "발표자료",
       skills: "기술 · 관심 분야",
@@ -166,7 +166,6 @@ const ko = {
     deckBody: "안녕하세요, 갤러리의 「{title}」(Lot {lot}) 작품을 보고 연락드립니다.\n\n- 이름 · 소속:\n- 문의 유형: (공유본 열람 / 새 덱 제작)\n- 발표 목적 · 일정:\n",
   },
   footer: {
-    rights: "강해 · Kang Hea",
     built: "Next.js로 만들고 Vercel에 배포했습니다.",
     top: "맨 위로",
   },
@@ -200,7 +199,7 @@ const en: Dictionary = {
       about: "About",
       education: "Education",
       experience: "Experience",
-      awards: "Awards",
+      awards: "Awards & competitions",
       projects: "Projects",
       decks: "Pitch decks",
       skills: "Skills & interests",
@@ -339,7 +338,6 @@ const en: Dictionary = {
     deckBody: "Hi, I'm reaching out about \"{title}\" (Lot {lot}) in your gallery.\n\n- Name & organization:\n- Request: (view the redacted copy / commission a new deck)\n- Purpose and timeline:\n",
   },
   footer: {
-    rights: "Kang Hea · 강해",
     built: "Built with Next.js, deployed on Vercel.",
     top: "Back to top",
   },
