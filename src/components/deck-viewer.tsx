@@ -1,0 +1,199 @@
+"use client";
+
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon, ExpandIcon, LockIcon, MailIcon } from "./icons";
+
+export type ViewerSlide =
+  | { slide: number; kind: "preview"; src: string; width: number; height: number }
+  | { slide: number; kind: "locked"; dataUrl: string };
+
+type Labels = {
+  open: string;
+  close: string;
+  prev: string;
+  next: string;
+  lockedTitle: string;
+  lockedBody: string;
+  inquire: string;
+  lockedSlide: string;
+  slideOf: string;
+  allSlides: string;
+  preview: string;
+  locked: string;
+};
+
+const pad = (n: number) => String(n).padStart(2, "0");
+
+/**
+ * 작품 감상기 — 공개 슬라이드는 크게 보이고, 비공개 슬라이드는 흐린 베일과 문의 안내만 보인다.
+ * 비공개 장의 이미지는 애초에 배포본에 없다(8px 색 견본만 전달).
+ */
+export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title: string; slides: ViewerSlide[]; mat: "light" | "dark"; inquireHref: string; labels: Labels }) {
+  const [index, setIndex] = useState(0);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const total = slides.length;
+  const current = slides[index];
+  const previews = slides.filter((s) => s.kind === "preview").length;
+
+  const go = useCallback((delta: number) => setIndex((i) => (i + delta + total) % total), [total]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go(1);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go(-1);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [go]);
+
+  // 크게 보기 중 비공개 장으로 넘어가면 창을 닫고 무대의 잠금 안내를 보여 준다.
+  useEffect(() => {
+    if (current.kind === "locked" && dialogRef.current?.open) dialogRef.current.close();
+  }, [current]);
+
+  const openLightbox = () => {
+    if (current.kind === "preview") dialogRef.current?.showModal();
+  };
+
+  const slideLabel = (n: number) => labels.slideOf.replace("{n}", String(n));
+  const summary = labels.allSlides
+    .replace("{total}", String(total))
+    .replace("{open}", String(previews))
+    .replace("{locked}", String(total - previews));
+
+  return (
+    <div>
+      {/* 무대 */}
+      <div className="relative">
+        <div className="spot" aria-hidden="true" />
+        <div className="frame">
+          <div className={`frame-mat ${mat === "dark" ? "dark-mat" : ""}`}>
+            <div className="relative aspect-video overflow-hidden bg-black" aria-live="polite">
+              {current.kind === "preview" ? (
+                <button type="button" onClick={openLightbox} className="group block h-full w-full cursor-zoom-in" aria-label={`${slideLabel(current.slide)} — ${labels.open}`}>
+                  <Image
+                    key={current.src}
+                    src={current.src}
+                    width={current.width}
+                    height={current.height}
+                    alt={`${title} — ${slideLabel(current.slide)}`}
+                    sizes="(min-width: 1140px) 1040px, 100vw"
+                    quality={90}
+                    preload={index === 0}
+                    className="h-full w-full object-contain"
+                  />
+                  <span className="absolute right-3 bottom-3 hidden items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[12.5px] font-bold text-white backdrop-blur group-hover:inline-flex sm:inline-flex">
+                    <ExpandIcon size={14} /> {labels.open}
+                  </span>
+                </button>
+              ) : (
+                <div className="absolute inset-0">
+                  <div className="veil" style={{ backgroundImage: `url(${current.dataUrl})` }} aria-hidden="true" />
+                  <div className="absolute inset-0 grid place-items-center bg-black/45 p-6 text-center backdrop-blur-sm">
+                    <div className="max-w-[420px]">
+                      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/40 text-[var(--gold)]">
+                        <LockIcon size={22} />
+                      </span>
+                      <p className="mt-4 mb-0 text-[clamp(17px,2.2vw,22px)] font-extrabold tracking-[-0.03em] text-white">{labels.lockedTitle}</p>
+                      <p className="mt-2 mb-0 hidden text-[14.5px] font-semibold leading-relaxed text-white/75 sm:block">{labels.lockedBody}</p>
+                      <a href={inquireHref} className="btn btn-sm mt-5">
+                        <MailIcon size={16} /> {labels.inquire}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 넘기기 */}
+      <div className="mt-6 flex items-center justify-between gap-4">
+        <button type="button" className="icon-btn !h-11 !w-11" onClick={() => go(-1)} aria-label={labels.prev}>
+          <ChevronLeftIcon />
+        </button>
+        <p className="num m-0 text-[15px] font-bold text-ink-2" aria-live="polite">
+          <span className="text-ink">{pad(current.slide)}</span>
+          <span className="mx-1.5 text-muted-2">/</span>
+          {pad(total)}
+          {current.kind === "locked" && (
+            <span className="ml-3 inline-flex items-center gap-1 align-middle text-[12.5px] font-bold text-muted-2">
+              <LockIcon size={13} /> {labels.locked}
+            </span>
+          )}
+        </p>
+        <button type="button" className="icon-btn !h-11 !w-11" onClick={() => go(1)} aria-label={labels.next}>
+          <ChevronRightIcon />
+        </button>
+      </div>
+
+      {/* 전체 장 */}
+      <p className="caption mt-10 mb-4">{summary}</p>
+      <ul className="m-0 grid list-none grid-cols-3 gap-2.5 p-0 sm:grid-cols-5 lg:grid-cols-7">
+        {slides.map((s, i) => (
+          <li key={s.slide}>
+            <button
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-current={i === index ? "true" : undefined}
+              aria-label={s.kind === "preview" ? slideLabel(s.slide) : `${slideLabel(s.slide)} — ${labels.lockedSlide}`}
+              className={`relative block w-full overflow-hidden rounded-[6px] outline-offset-2 transition ${i === index ? "ring-2 ring-[var(--gold)]" : "opacity-80 hover:opacity-100"}`}
+            >
+              {s.kind === "preview" ? (
+                <span className="relative block aspect-video bg-black">
+                  <Image src={s.src} width={s.width} height={s.height} alt="" sizes="160px" className="h-full w-full object-cover" />
+                  <span className="num absolute left-1.5 top-1 rounded bg-black/55 px-1 text-[10.5px] font-bold text-white">{pad(s.slide)}</span>
+                </span>
+              ) : (
+                <span className="relative block aspect-video overflow-hidden bg-card-2">
+                  <span className="veil" style={{ backgroundImage: `url(${s.dataUrl})` }} aria-hidden="true" />
+                  <span className="lock-glass">
+                    <LockIcon size={15} />
+                  </span>
+                  <span className="num absolute left-1.5 top-1 text-[10.5px] font-bold text-white/80">{pad(s.slide)}</span>
+                </span>
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {/* 크게 보기 */}
+      <dialog
+        ref={dialogRef}
+        className="m-auto max-h-none max-w-none bg-transparent p-0 backdrop:bg-black/90 backdrop:backdrop-blur-sm"
+        aria-label={title}
+        onClick={(e) => {
+          if (e.target === dialogRef.current) dialogRef.current?.close();
+        }}
+      >
+        {current.kind === "preview" && (
+          <div className="relative w-[min(96vw,calc(92vh*16/9))]">
+            <Image src={current.src} width={current.width} height={current.height} alt={`${title} — ${slideLabel(current.slide)}`} sizes="96vw" quality={90} className="w-full rounded-md" />
+            <div className="mt-3 flex items-center justify-center gap-3">
+              <button type="button" className="icon-btn !border-white/20 !text-white" onClick={() => go(-1)} aria-label={labels.prev}>
+                <ChevronLeftIcon />
+              </button>
+              <button type="button" className="icon-btn !border-white/20 !text-white" onClick={() => dialogRef.current?.close()} aria-label={labels.close} autoFocus>
+                <CloseIcon />
+              </button>
+              <button type="button" className="icon-btn !border-white/20 !text-white" onClick={() => go(1)} aria-label={labels.next}>
+                <ChevronRightIcon />
+              </button>
+            </div>
+          </div>
+        )}
+      </dialog>
+    </div>
+  );
+}
