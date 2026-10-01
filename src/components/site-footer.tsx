@@ -10,28 +10,25 @@ import { GithubIcon, MailIcon } from "./icons";
 export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
     <footer>
-      <section id="contact" className="sec relative overflow-hidden border-t border-line" aria-labelledby="contact-title">
-        <div className="glow" style={{ top: "70%" }} aria-hidden="true" />
-        <div className="wrap relative z-[1] text-center">
-          <p className="eyebrow">
-            <span className="dot" aria-hidden="true" /> Contact
-          </p>
-          <h2 id="contact-title" className="h2">
-            {dict.contact.title}
-          </h2>
-          <p className="copy mx-auto mt-5">{dict.contact.lead}</p>
-          <a
-            href={mailto(profile.email, dict.contact.mailSubject)}
-            className="mt-10 inline-block break-all text-[clamp(26px,5vw,56px)] font-extrabold tracking-[-0.04em] g-gold"
-          >
-            {profile.email}
-          </a>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <a href={mailto(profile.email, dict.contact.mailSubject)} className="btn">
-              <MailIcon size={19} />
+      {/* 단정한 연락 카드 — 메인의 이력서형 톤에 맞춘다(화려한 연출은 갤러리 몫). */}
+      <section id="contact" className="scroll-mt-[calc(var(--nav-h)+16px)] border-t border-line bg-bg-1" aria-labelledby="contact-title">
+        <div className="wrap flex flex-col gap-6 py-[clamp(36px,6vw,64px)] md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="m-0 text-[13.5px] font-bold text-gold-text">Contact</p>
+            <h2 id="contact-title" className="m-0 mt-1 text-[clamp(22px,2.6vw,28px)] font-extrabold tracking-[-0.03em]">
+              {dict.contact.title}
+            </h2>
+            <p className="m-0 mt-2 max-w-[34em] text-[15px] leading-relaxed text-muted-2">{dict.contact.lead}</p>
+            <a href={mailto(profile.email, dict.contact.mailSubject)} className="mt-3 inline-block break-all text-[17px] font-bold text-ink underline decoration-line underline-offset-4 hover:decoration-[var(--ink)]">
+              {profile.email}
+            </a>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a href={mailto(profile.email, dict.contact.mailSubject)} className="btn-solid !px-5">
+              <MailIcon size={17} />
               {dict.contact.write}
             </a>
-            <CopyEmail email={profile.email} label={dict.contact.copy} done={dict.contact.copied} />
+            <CopyEmail email={profile.email} label={dict.contact.copy} done={dict.contact.copied} className="btn-line !px-5" />
           </div>
         </div>
       </section>

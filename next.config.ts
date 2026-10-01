@@ -1,13 +1,16 @@
 import type { NextConfig } from "next";
 
 // `/` 는 화면 없이 언어별 홈으로 보낸다(서버 코드 없이 Vercel 라우팅 단계에서 처리).
-// 순서: 직접 고른 언어(쿠키) → 브라우저 언어(Accept-Language 첫 항목) → 한국어.
+// 순서: 직접 고른 언어(쿠키) → 브라우저 첫 언어가 한국어면 /ko → 그 밖의 언어를 보낸 브라우저는 /en
+//      → Accept-Language 가 없는 요청(검색 로봇 등)은 /ko.
+// has.value 는 정규식 전체 일치다 — 대소문자를 둘 다 적는다.
 const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/", has: [{ type: "cookie", key: "locale", value: "en" }], destination: "/en", permanent: false },
       { source: "/", has: [{ type: "cookie", key: "locale", value: "ko" }], destination: "/ko", permanent: false },
-      { source: "/", has: [{ type: "header", key: "accept-language", value: "en(?:[-_][A-Za-z0-9]+)?(?:[,;].*)?" }], destination: "/en", permanent: false },
+      { source: "/", has: [{ type: "header", key: "accept-language", value: "\\s*[kK][oO](?:[-_,;].*)?" }], destination: "/ko", permanent: false },
+      { source: "/", has: [{ type: "header", key: "accept-language" }], destination: "/en", permanent: false },
       { source: "/", destination: "/ko", permanent: false },
     ];
   },

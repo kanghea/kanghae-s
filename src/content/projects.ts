@@ -2,8 +2,8 @@ import type { Project } from "./types";
 
 /**
  * 프로젝트 목록 — 배열 순서가 곧 노출 순서다.
- * 원칙: 저장소·발표자료·본인이 정리한 기록으로 확인된 사실만 적는다. 모르는 칸은 비운다.
- * 비공개 저장소(중개사코치·오목조목·서문12)는 코드 링크를 걸지 않는다.
+ * 원칙: 저장소 · 발표자료 · 본인이 정리한 기록으로 확인된 사실만 적는다. 모르는 칸은 비운다.
+ * 비공개 저장소(중개사코치 · 오목조목 · 서문12)는 코드 링크를 걸지 않는다.
  */
 export const projects: Project[] = [
   {
@@ -11,10 +11,10 @@ export const projects: Project[] = [
     name: { ko: "중개사코치", en: "Junggaesa Coach" },
     tagline: {
       ko: "공인중개사 8개년 기출 1,569문항에서 오늘 풀 문제를 골라 주는 학습 코치 앱",
-      en: "A study-coach app that picks today's questions from 1,569 past exam questions for Korea's real-estate agent license",
+      en: "A study-coach app that picks today's questions from 1,569 past exam questions (8 years, 2018–2025) for Korea's licensed real-estate agent exam",
     },
     summary: {
-      ko: "시험일과 목표에 맞춰 매일의 학습량을 짜 주고, 틀린 문제를 다시 불러오고, 과목별 예상 점수로 합격선까지 관리해 줍니다. 기획부터 데이터 검증·개발·배포·운영까지 혼자 했습니다.",
+      ko: "시험일과 목표에 맞춰 매일의 학습량을 짜 주고, 틀린 문제를 다시 불러오고, 과목별 예상 점수로 합격선까지 관리해 줍니다. 기획부터 데이터 검증 · 개발 · 배포 · 운영까지 혼자 했습니다.",
       en: "It plans each day's workload around the exam date and your goal, brings back the questions you missed, and tracks predicted scores per subject against the pass line. I did everything — planning, data validation, development, release, and operations.",
     },
     period: { ko: "2026.07 – 현재", en: "Jul 2026 – present" },
@@ -26,8 +26,8 @@ export const projects: Project[] = [
     metrics: [
       { value: "1,569", label: { ko: "검증한 기출 문항 (2018–2025)", en: "Verified past-exam questions (2018–2025)" } },
       { value: "356", label: { ko: "개념 카드", en: "Concept cards" } },
-      { value: "193", label: { ko: "편 학습 만화", en: "Study comics" } },
-      { value: "83", label: { ko: "개 PR 머지 (12주)", en: "PRs merged in 12 weeks" } },
+      { value: { ko: "193편", en: "193" }, label: { ko: "학습 만화", en: "Study comics" } },
+      { value: { ko: "83개", en: "83" }, label: { ko: "PR 머지 (12주)", en: "PRs merged in 12 weeks" } },
     ],
     story: [
       {
@@ -52,15 +52,15 @@ export const projects: Project[] = [
         },
         bullets: {
           ko: [
-            "시험일과 목표(1차 · 2차 · 동차)에 맞춘 '오늘 학습' — 개념 카드 → 실제 기출 → 즉시 채점 → 선지별 O/X 해설",
+            "시험일과 목표(1차 · 2차 · 동차)에 맞춘 '오늘 학습' — 실제 기출 → 즉시 채점 → 선지별 O/X 해설, 원하면 개념 카드부터",
             "틀린 문제는 1일 · 3일 뒤 다시 출제, 두 번 연속 맞히면 졸업하는 복습 일정",
             "과목별 예상 점수와 과락선을 비교하는 리포트, 위험 과목은 출제 비중을 자동으로 올림",
             "실전 모의고사(8개년) · 월간 진단 모의고사 · 친구에게 보내는 레벨 테스트",
           ],
           en: [
-            "A daily plan tuned to the exam date and goal (stage 1, stage 2, or both): concept card → real past question → instant grading → per-choice O/X explanations",
+            "A daily plan tuned to the exam date and goal (stage 1, stage 2, or both): real past questions → instant grading → true/false explanations for every answer choice, with optional concept cards first",
             "Spaced review that brings missed questions back after 1 and 3 days and 'graduates' them after two correct answers in a row",
-            "Reports comparing predicted scores per subject with the fail line, automatically weighting at-risk subjects",
+            "Reports comparing predicted scores per subject with each subject's minimum passing score (40/100), automatically weighting at-risk subjects",
             "Full mock exams for eight years, monthly diagnostic exams, and a shareable level-test challenge",
           ],
         },
@@ -89,8 +89,8 @@ export const projects: Project[] = [
       {
         key: "result",
         body: {
-          ko: "웹에서 설치 · 가입 없이 바로 쓸 수 있게 운영 중이고, Android는 Google Play 비공개 베타로 배포했습니다. 2018–2021 기출은 현행 법령으로 다시 검토해 답이 달라진 31문항을 뺐고, 웹 배포 용량을 37% 줄여 검색으로 들어온 첫 방문을 46% 가볍게 했습니다.",
-          en: "It runs on the web with no install or sign-up, and the Android app shipped as a Google Play closed beta. I re-reviewed the 2018–2021 questions against current law and removed 31 whose answers had changed, and cut the web deployment by 37%, making first visits from search 46% lighter.",
+          ko: "웹에서 설치 · 가입 없이 바로 쓸 수 있게 운영 중이고, Android는 Google Play 비공개 베타로 배포했습니다. 2018–2021 기출은 현행 법령으로 다시 검토해 맞지 않게 된 31문항(정답 변경 · 조문 폐지 등)을 뺐고, 웹 배포 용량을 37% 줄여 검색으로 들어온 첫 방문을 46% 가볍게 했습니다.",
+          en: "It runs on the web with no install or sign-up, and the Android app shipped as a Google Play closed beta. I re-reviewed the 2018–2021 questions against current law and removed 31 that no longer hold (changed answers, repealed provisions), and cut the web deployment by 37%, making first visits from search 46% lighter.",
         },
       },
     ],
@@ -109,7 +109,7 @@ export const projects: Project[] = [
       { src: "/projects/junggaesacoach/screen-home.webp", width: 900, height: 1951, alt: { ko: "홈 — 오늘 학습", en: "Home — today's study" } },
       { src: "/projects/junggaesacoach/screen-concept.webp", width: 900, height: 1951, alt: { ko: "개념 카드와 3컷 만화", en: "Concept card with a 3-panel comic" } },
       { src: "/projects/junggaesacoach/screen-correct.webp", width: 900, height: 1951, alt: { ko: "즉시 채점", en: "Instant grading" } },
-      { src: "/projects/junggaesacoach/screen-wrongnote.webp", width: 900, height: 1951, alt: { ko: "오답노트와 복습 일정", en: "Wrong-answer notes with review dates" } },
+      { src: "/projects/junggaesacoach/screen-wrongnote.webp", width: 900, height: 1951, alt: { ko: "오답노트와 복습 일정", en: "Mistake notebook with review dates" } },
       { src: "/projects/junggaesacoach/screen-report.webp", width: 900, height: 1951, alt: { ko: "과목별 예상 점수 리포트", en: "Predicted-score report by subject" } },
       { src: "/projects/junggaesacoach/screen-level-result.webp", width: 900, height: 1951, alt: { ko: "레벨 테스트 결과", en: "Level-test result" } },
     ],
@@ -123,8 +123,8 @@ export const projects: Project[] = [
       en: "A tactical platform that rapidly reconstructs operating areas in 3D from drone footage alone",
     },
     summary: {
-      ko: "공군 복무 중 본 ISR 드론 운용의 한계에서 출발했습니다. 드론 영상을 NeRF · 3D Gaussian Splatting으로 재구성해 훈련 전에 공간을 자유 시점으로 둘러보게 하는 시스템을 기획했고, 2026 공군 창업경진대회 본선에 올랐습니다.",
-      en: "It began with the limits of ISR drone operations I saw while serving in the Air Force. We designed a system that reconstructs drone footage with NeRF and 3D Gaussian Splatting so units can explore a space from any viewpoint before training — and reached the finals of the 2026 ROK Air Force Startup Competition.",
+      ko: "ISR 드론 운용의 한계에서 출발한 팀 오일머니의 프로젝트입니다. 드론 영상을 NeRF · 3D Gaussian Splatting으로 재구성해 훈련 전에 공간을 자유 시점으로 둘러보게 하는 시스템을 기획해 2026 공군 창업경진대회 본선에 올랐고, 저는 공군 정보통신학교 조교로 지켜본 군 교육의 한계를 바탕으로 문제 정의 · 사업 기획 · 시장 검증 · 파일럿 설계 · 발표를 맡았습니다.",
+      en: "A Team Oil Money project that started from the limits of ISR drone operations. We designed a system that reconstructs drone footage with NeRF and 3D Gaussian Splatting so units can explore a space from any viewpoint before training, and reached the finals of the 2026 ROK Air Force Startup Competition. Drawing on what I saw of military training as an assistant instructor, I owned problem definition, business planning, market validation, pilot design, and the pitch.",
     },
     period: { ko: "2026", en: "2026" },
     year: 2026,
@@ -138,8 +138,8 @@ export const projects: Project[] = [
     stack: ["NeRF", "3D Gaussian Splatting", "On-premise", "ATAK / WinTAK"],
     metrics: [
       { value: { ko: "2분", en: "2 min" }, label: { ko: "목표 처리 시간 (영상 → 3D)", en: "Target processing time (video → 3D)" } },
-      { value: "5", label: { ko: "가지 3D 재구성 방식 비교", en: "3D reconstruction methods compared" } },
-      { value: { ko: "본선", en: "Finals" }, label: { ko: "2026 공군 창업경진대회 진출", en: "2026 ROK Air Force Startup Competition" } },
+      { value: { ko: "5가지", en: "5" }, label: { ko: "비교한 3D 재구성 방식", en: "3D reconstruction methods compared" } },
+      { value: { ko: "본선 진출", en: "Finalist" }, label: { ko: "2026 공군 창업경진대회", en: "2026 ROK Air Force Startup Competition" } },
     ],
     story: [
       {
@@ -181,7 +181,7 @@ export const projects: Project[] = [
         key: "role",
         body: {
           ko: "공군 정보통신학교 조교로 지내며 본 군 교육의 한계를 문제로 정의하고, 군 작전 환경 분석 · 현장 적용성 검토 · 파일럿 프로젝트 설계와 사업 기획 · 시장 검증 · 발표를 맡았습니다.",
-          en: "Drawing on what I saw as a teaching assistant at the Air Force Information & Communications School, I defined the problem and owned the operational-environment analysis, field-applicability review, pilot design, business planning, market validation, and the pitch.",
+          en: "Drawing on what I saw as an assistant instructor at the Air Force Information & Communications School, I defined the problem and owned the operational-environment analysis, field-applicability review, pilot design, business planning, market validation, and the pitch.",
         },
       },
       {
@@ -230,9 +230,9 @@ export const projects: Project[] = [
     team: { ko: "KNU 싱크탱크 · 기획 3인 + 개발 3인", en: "KNU Think Tank · 3 planners + 3 engineers" },
     stack: ["Multimodal VLM", "RAG", "LLM API"],
     metrics: [
-      { value: "37", label: { ko: "명 인터뷰 (건물주 · 수리업자 · 세입자)", en: "Interviews (landlords, contractors, tenants)" } },
+      { value: { ko: "37명", en: "37" }, label: { ko: "인터뷰 (건물주 · 수리업자 · 세입자)", en: "Interviews (landlords, contractors, tenants)" } },
       { value: { ko: "약 4배", en: "~4×" }, label: { ko: "임대차분쟁조정 접수 증가 (2023→2025)", en: "Rise in rental-dispute mediation filings (2023→2025)" } },
-      { value: "120", label: { ko: "호실 PoC 테스트베드 확보", en: "Rental units secured as a PoC test bed" } },
+      { value: { ko: "120호실", en: "120" }, label: { ko: "PoC 테스트베드 확보", en: "Rental units secured as a PoC test bed" } },
     ],
     story: [
       {
@@ -245,8 +245,8 @@ export const projects: Project[] = [
       {
         key: "insight",
         body: {
-          ko: "건물주 12명 · 수리업자 5명 · 세입자 20명을 인터뷰해 보니 핵심은 '책임 범위를 모른다'는 것이었습니다. 건물주는 민원 1건에 12시간 넘게 쓰고, 세입자는 해결까지 평균 14일 넘게 기다렸습니다. 기존 서비스는 접수 · 판단 · 업체 배정 · 정산 중 일부만 다뤄 과정이 쪼개져 있었습니다.",
-          en: "Interviews with 12 landlords, 5 contractors, and 20 tenants pointed to one core issue: nobody knows where responsibility lies. Landlords spent 12+ hours per request and tenants waited 14+ days on average for a fix. Existing services covered only parts of intake, judgment, dispatch, and settlement, leaving the process fragmented.",
+          ko: "건물주 12명 · 수리업자 5명 · 세입자 20명을 인터뷰해 보니 핵심은 '책임 범위를 모른다'는 것이었습니다. 건물주는 민원 1건에 12시간 넘게 쓰고, 해결까지는 평균 14일 넘게 걸렸습니다(인터뷰 응답 평균). 기존 서비스는 접수 · 판단 · 업체 배정 · 정산 중 일부만 다뤄 과정이 쪼개져 있었습니다.",
+          en: "Interviews with 12 landlords, 5 contractors, and 20 tenants pointed to one core issue: nobody knows where responsibility lies. Landlords spent 12+ hours per request, and a request took 14+ days on average to resolve (interview average). Existing services covered only parts of intake, judgment, dispatch, and settlement, leaving the process fragmented.",
         },
       },
       {
@@ -280,7 +280,7 @@ export const projects: Project[] = [
       {
         key: "result",
         body: {
-          ko: "MVP 시연까지 마쳤고, 대구 북구의 수리업체와 협업을 확보하고 원룸 120호실을 PoC 테스트베드로 확보했습니다.",
+          ko: "MVP 시연까지 마쳤고, 대구 북구의 수리업체와 협업하며 원룸 120호실을 PoC 테스트베드로 확보했습니다.",
           en: "We completed an MVP demo, secured a partnership with a repair company in Buk-gu, Daegu, and lined up 120 studio units as a PoC test bed.",
         },
       },
@@ -299,7 +299,7 @@ export const projects: Project[] = [
     name: { ko: "서문12", en: "Seomun12" },
     tagline: {
       ko: "QR 하나로 대구 서문시장 가게의 4개 국어 메뉴판 · 결제 안내 · 시장 안 길찾기를 여는 웹 서비스",
-      en: "One QR scan opens a Seomun Market store's menu in four languages, payment guide, and in-market walking directions",
+      en: "One QR scan opens a Seomun Market store's menu in four languages, a payment guide, and in-market walking directions",
     },
     summary: {
       ko: "서문시장 상인회와 협업한 학생 프로젝트입니다. 가게마다 붙인 QR로 한 · 영 · 중 · 일 메뉴판과 결제 방법, 가게 이야기, 시장 골목 길찾기를 보여 주는 모바일 웹을 처음부터 끝까지 개발했습니다.",
@@ -313,15 +313,15 @@ export const projects: Project[] = [
     team: { ko: "학생팀 × 서문시장 상인회", en: "Student team × Seomun Market merchants' association" },
     stack: ["Next.js 15", "React 19", "TypeScript", "Tailwind CSS 4", "MongoDB", "NextAuth", "Kakao Login", "NAVER Maps", "Docker", "Nginx"],
     metrics: [
-      { value: "4", label: { ko: "개 국어 (한 · 영 · 중 · 일)", en: "Languages (KO · EN · ZH · JA)" } },
-      { value: "85", label: { ko: "개 API 라우트", en: "API routes" } },
+      { value: { ko: "4개 국어", en: "4" }, label: { ko: "한 · 영 · 중 · 일", en: "Languages (KO · EN · ZH · JA)" } },
+      { value: { ko: "85개", en: "85" }, label: { ko: "API 라우트", en: "API routes" } },
       { value: "416", label: { ko: "커밋 (2025.03–06)", en: "Commits (Mar–Jun 2025)" } },
     ],
     story: [
       {
         key: "problem",
         body: {
-          ko: "서문시장에는 오래된 맛집과 이야기가 많지만, 방문객 — 특히 외국인 — 은 메뉴를 읽기 어렵고, 현금 · 계좌이체만 받는 가게에서 결제가 막히며, 미로 같은 시장 안에서 가게를 찾기 힘듭니다. 일반 지도 앱의 길찾기는 시장 내부 골목을 다루지 못했습니다.",
+          ko: "서문시장에는 오래된 맛집과 이야기가 많지만, 방문객, 특히 외국인은 메뉴를 읽기 어렵고, 현금 · 계좌이체만 받는 가게에서 결제가 막히며, 미로 같은 시장 안에서 가게를 찾기 힘듭니다. 일반 지도 앱의 길찾기는 시장 내부 골목을 다루지 못했습니다.",
           en: "Seomun Market is full of long-standing food stalls and their stories, but visitors — especially from abroad — struggle to read menus, get stuck paying at cash- or transfer-only stalls, and have trouble finding stores inside the maze-like market. General map apps don't route through the market's inner alleys.",
         },
       },
@@ -341,7 +341,7 @@ export const projects: Project[] = [
           ],
           en: [
             "Menus in four languages, business hours, and interview stories about each store",
-            "Payment help — copy the account number, open the Toss app directly, and clear 'cash only' labels",
+            "Payment help — copy the account number, open Toss in one tap, and see a clear 'cash only' notice where it applies",
             "In-market walking directions — Dijkstra shortest paths on a hand-mapped alley graph, switching to NAVER Directions outside the market",
             "Automatic re-routing when you drift 30 m+ off the route, with Catmull-Rom curves and Douglas-Peucker simplification for smooth paths",
             "An admin dashboard tracking QR scans through to visits",
@@ -381,11 +381,11 @@ export const projects: Project[] = [
     status: "shipped",
     categories: { ko: ["게임", "실시간 웹"], en: ["Game", "Real-time web"] },
     role: { ko: "1인 개발 — 서버 · AI 엔진 · 웹 클라이언트", en: "Solo developer — server, AI engine, web client" },
-    stack: ["React 18", "Node.js", "Express", "Socket.IO", "MongoDB", "JWT", "Google OAuth", "Tailwind CSS", "Next.js 15"],
+    stack: ["React 18", "Node.js", "Express", "Socket.IO", "MongoDB", "JWT", "Google OAuth", "Tailwind CSS"],
     metrics: [
       { value: "193", label: { ko: "커밋 (6주)", en: "Commits in 6 weeks" } },
-      { value: "10", label: { ko: "단계 AI 난이도", en: "AI difficulty tiers" } },
-      { value: "15×15", label: { ko: "삼삼 금수 판정", en: "Board with double-three rule" } },
+      { value: { ko: "10단계", en: "10" }, label: { ko: "AI 난이도", en: "AI difficulty tiers" } },
+      { value: "15×15", label: { ko: "판 · 삼삼 금수 판정", en: "Board with the double-three rule" } },
     ],
     story: [
       {
@@ -428,8 +428,8 @@ export const projects: Project[] = [
       {
         key: "product",
         body: {
-          ko: "데스크톱과 모바일 화면을 따로 설계했습니다 — 모바일은 스와이프 탭, 핀치 · 레버 확대, 이모지 채팅, 효과음과 승리 연출까지. 운영을 위해 일일 지표(신규 · DAU · 동시 접속 · 대국 수)를 매일 아침 메일로 받는 리포트도 붙였습니다.",
-          en: "Desktop and mobile got separate designs — the mobile UI has swipe tabs, pinch and lever zoom, emoji chat, sound effects, and a win animation. For operations, a daily report emails new users, DAU, peak concurrency, and game counts every morning.",
+          ko: "데스크톱과 모바일 화면을 따로 설계했습니다 — 모바일은 스와이프 탭, 핀치 · 레버 확대, 이모지 채팅, 효과음과 승리 연출까지. 운영을 위해 일일 지표(신규 · DAU · 동시 접속 · 대국 수)를 매일 자정에 메일로 받는 리포트도 붙였습니다.",
+          en: "Desktop and mobile got separate designs — the mobile UI has swipe tabs, pinch and lever zoom, emoji chat, sound effects, and a win animation. For operations, a daily report emails new users, DAU, peak concurrency, and game counts every night at midnight (KST).",
         },
       },
       {
@@ -512,7 +512,7 @@ export const projects: Project[] = [
         key: "solution",
         body: {
           ko: "조건만 넣으면 코스가 완성되는 구조를 제안했습니다.",
-          en: "We proposed a service where entering your conditions produces a finished itinerary.",
+          en: "The plan proposes a service where entering your conditions produces a finished itinerary.",
         },
         bullets: {
           ko: ["직관적인 여행 코스 생성 UI", "A* 기반 이동 경로 탐색", "이동 시간 · 여행 비용 자동 계산", "국내 → 일본 → 동남아로 넓히는 확장 구조"],
@@ -523,7 +523,7 @@ export const projects: Project[] = [
         key: "result",
         body: {
           ko: "예약 수수료 · 광고 · 구독 · 데이터 API로 이어지는 비즈니스 모델과 시장 분석, 사업화 전략을 담은 사업계획 발표를 만들었습니다.",
-          en: "We produced a business-plan pitch covering the revenue model (booking fees, ads, subscriptions, a data API), market analysis, and go-to-market strategy.",
+          en: "The result was a business-plan pitch covering the revenue model (booking fees, ads, subscriptions, a data API), market analysis, and go-to-market strategy.",
         },
       },
     ],

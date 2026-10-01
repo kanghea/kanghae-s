@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/gallery"
   return pageMetadata(locale, "/gallery", {
     title: dict.gallery.titleLocal,
     description: dict.gallery.lead,
-    image: cover ? { url: cover.src, width: cover.width, height: cover.height, alt: dict.gallery.title } : { ...DEFAULT_OG },
+    image: cover ? { url: cover.src, width: cover.width, height: cover.height, alt: dict.gallery.titleLocal } : { ...DEFAULT_OG },
   });
 }
 
@@ -31,7 +31,7 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
   const g = dict.gallery;
   const totalSlides = decks.reduce((n, d) => n + d.manifest.slideCount, 0);
   const openSlides = decks.reduce((n, d) => n + d.manifest.previews.length, 0);
-  const commissionHref = mailto(profile.email, `${dict.contact.commissionSubject}${locale === "ko" ? "제작 문의" : "Inquiry"}`, dict.contact.commissionBody);
+  const commissionHref = mailto(profile.email, dict.contact.commissionSubject, dict.contact.commissionBody);
 
   return (
     <div className="museum wall -mb-px">
@@ -51,7 +51,7 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
         </div>
       </section>
 
-      <section aria-label={g.title}>
+      <section aria-label={g.titleLocal}>
         {decks.map((d, i) => {
           const cover = d.manifest.previews[0];
           const locked = deckLockedCount(d);
@@ -59,10 +59,11 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
             ...d.manifest.previews.map((p) => ({ slide: p.slide, preview: p })),
             ...d.manifest.veils.slice(0, 2).map((v) => ({ slide: v.slide, veil: v })),
           ];
-          const inquire = mailto(profile.email, `${dict.contact.commissionSubject}${tx(d.title, locale)}`, fmt(dict.contact.deckBody, { title: tx(d.title, locale), lot: String(d.lot).padStart(2, "0") }));
+          const lotNo = String(d.lot).padStart(2, "0");
+          const inquire = mailto(profile.email, fmt(g.inquirySubject, { title: tx(d.title, locale), lot: lotNo }), fmt(dict.contact.deckBody, { title: tx(d.title, locale), lot: lotNo }));
           return (
             <article key={d.slug} className="border-t border-line py-[clamp(56px,8vw,104px)]" aria-labelledby={`lot-${d.slug}`}>
-              <div className={`wrap grid items-center gap-[clamp(32px,5vw,64px)] lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] ${i % 2 ? "lg:[&>*:first-child]:order-2" : ""}`}>
+              <div className={`wrap grid items-center gap-[clamp(32px,5vw,64px)] ${i % 2 ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] lg:[&>*:first-child]:order-2" : "lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]"}`}>
                 <div className="rv">
                   <Link href={`/${locale}/gallery/${d.slug}`} className="group relative block" aria-label={`${g.enter} — ${tx(d.title, locale)}`}>
                     <div className="spot" aria-hidden="true" />
@@ -93,8 +94,8 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
 
                 <div className="rv d1">
                   <div className="placard !p-[clamp(20px,2.4vw,30px)]">
-                    <p className="m-0 text-[12.5px] font-extrabold tracking-[0.16em] text-[#8a6a2a]">
-                      {g.lot} {String(d.lot).padStart(2, "0")}
+                    <p className="placard-lot m-0 text-[12.5px] font-extrabold tracking-[0.16em]">
+                      {g.lot} {lotNo}
                     </p>
                     <h2 id={`lot-${d.slug}`} className="m-0 mt-2 text-[clamp(26px,2.8vw,34px)] font-extrabold leading-tight tracking-[-0.04em]">
                       {tx(d.title, locale)}
@@ -105,11 +106,12 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
                         [g.year, String(d.year)],
                         [g.usedFor, tx(d.usedFor, locale)],
                         ...(d.result ? [[g.result, tx(d.result, locale)]] : []),
+                        ...(d.credit ? [[g.credit, tx(d.credit, locale)]] : []),
                         [g.medium, tx(d.medium, locale)],
-                        [g.slideCount, `${d.manifest.slideCount}${locale === "ko" ? "장" : ` ${g.slides}`} · ${g.preview} ${d.manifest.previews.length} · ${g.locked} ${locked}`],
+                        [g.slideCount, fmt(g.slideSummary, { total: d.manifest.slideCount, open: d.manifest.previews.length, locked })],
                         [g.estimate, g.estimateValue],
                       ].map(([k, v]) => (
-                        <div key={k} className="grid grid-cols-[76px_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
+                        <div key={k} className="grid grid-cols-[minmax(76px,max-content)_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
                           <dt className="muted font-bold">{k}</dt>
                           <dd className="m-0 font-semibold">{v}</dd>
                         </div>

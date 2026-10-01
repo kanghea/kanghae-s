@@ -49,7 +49,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
       <header className="relative overflow-hidden">
         <div className="glow" style={{ top: "0%" }} aria-hidden="true" />
         <div className="wrap relative z-[1] pt-[clamp(28px,5vw,56px)]">
-          <Link href={`/${locale}/projects`} className="caption inline-flex items-center gap-1.5 hover:text-ink">
+          <Link href={`/${locale}/projects`} className="caption -my-2 inline-flex min-h-10 items-center gap-1.5 hover:text-ink">
             <ArrowLeftIcon size={16} />
             {dict.projects.back}
           </Link>
@@ -115,7 +115,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
         )}
       </div>
 
-      <section className="wrap mt-[clamp(48px,7vw,88px)]" aria-label={tx(project.name, locale)}>
+      <section className="wrap mt-[clamp(48px,7vw,88px)]">
         <p className="body rv mb-[clamp(32px,5vw,56px)] max-w-[44em] !text-[clamp(18px,1.7vw,21px)] !leading-[1.7] font-semibold text-ink">{tx(project.summary, locale)}</p>
         {project.story.map((step, i) => (
           <section key={step.key} className="story-step rv" aria-labelledby={`step-${step.key}`}>
@@ -142,17 +142,20 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
       </section>
 
       {project.screens && (
-        <section className="mt-[clamp(48px,7vw,88px)]" aria-label={dict.projects.storyLabel.product}>
+        <section className="mt-[clamp(48px,7vw,88px)]" aria-labelledby="screens-title">
           <div className="wrap">
-            <p className="eyebrow">Screens</p>
+            <h2 id="screens-title" className="eyebrow">
+              {dict.projects.screens}
+            </h2>
           </div>
           <div className="wrap">
-            <ul className="hscroll m-0 list-none p-0 pb-2">
+            {/* 모바일은 가로로 넘기고, 넓은 화면은 한 줄 격자로 전부 보인다(숨은 스크롤 없음). */}
+            <ul className="hscroll m-0 list-none p-0 pb-2 lg:grid lg:grid-cols-6 lg:gap-4 lg:overflow-visible">
               {project.screens.map((s) => (
-                <li key={s.src} className="w-[min(46vw,220px)]">
+                <li key={s.src} className="w-[min(46vw,220px)] lg:w-auto">
                   <figure className="m-0">
                     <div className="overflow-hidden rounded-[22px] border border-line bg-card-2">
-                      <Image src={s.src} width={s.width} height={s.height} alt={tx(s.alt, locale)} sizes="220px" className="w-full" />
+                      <Image src={s.src} width={s.width} height={s.height} alt="" sizes="(min-width: 1024px) 180px, 46vw" className="w-full" />
                     </div>
                     <figcaption className="caption mt-3 text-center">{tx(s.alt, locale)}</figcaption>
                   </figure>

@@ -20,7 +20,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#000000",
+  themeColor: "#ffffff",
 };
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
@@ -36,8 +36,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   };
 }
 
-// 첫 그리기 전에 실행 — 저장된 밝은 화면 선택을 복원하고, JS 가 있음을 표시한다(.rv 등장 효과용).
-const bootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{if(localStorage.getItem('theme')==='light')d.dataset.theme='light'}catch(e){}})();`;
+// 첫 그리기 전에 실행 — 저장된 어두운 화면 선택을 복원하고, JS 가 있음을 표시한다(.rv 등장 효과용).
+const bootScript = `(function(){var d=document.documentElement;d.classList.add('js');try{if(localStorage.getItem('theme')==='dark'){d.dataset.theme='dark';var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content','#000000')}}catch(e){}})();`;
 
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
@@ -70,6 +70,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
             language: dict.nav.language,
             themeToLight: dict.nav.themeToLight,
             themeToDark: dict.nav.themeToDark,
+            primary: dict.nav.primary,
+            primaryMobile: dict.nav.primaryMobile,
           }}
         />
         <main id="main" tabIndex={-1}>

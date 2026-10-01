@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/profile"
   const { locale } = await params;
   if (!hasLocale(locale)) return {};
   const dict = getDictionary(locale);
-  return pageMetadata(locale, "/profile", { title: dict.profile.title, description: tx(profile.intro, locale) });
+  return pageMetadata(locale, "/profile", { title: dict.profile.title, description: dict.profile.description });
 }
 
 type TimelineItem = { year: number; kind: "award" | "project"; title: string; sub?: string; href?: string; badge?: string };
@@ -58,9 +58,12 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
       <section className="relative overflow-hidden" aria-labelledby="profile-title">
         <div className="glow" style={{ top: "10%" }} aria-hidden="true" />
         <div className="wrap relative z-[1] pt-[clamp(56px,9vw,120px)] pb-[clamp(40px,6vw,72px)]">
-          <p className="eyebrow rv">Profile</p>
+          <p className="eyebrow rv">{dict.profile.eyebrow}</p>
           <h1 id="profile-title" className="h1 h1-sm rv d1">
-            {tx(profile.name, locale)} <span className="text-muted-2">{tx(profile.altName, locale)}</span>
+            {tx(profile.name, locale)}{" "}
+            <span className="text-muted-2" lang={locale === "ko" ? "en" : "ko"}>
+              {tx(profile.altName, locale)}
+            </span>
           </h1>
           <p className="copy rv d2 mt-6 !text-[clamp(19px,2vw,24px)]">
             <b>{tx(profile.headline, locale)}</b> {dict.profile.lead}
@@ -130,7 +133,7 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
 
       <section id="timeline" className="sec-tight" aria-labelledby="timeline-title">
         <div className="wrap-narrow">
-          <SectionHead id="timeline-title" eyebrow="Record" title={dict.profile.timeline} lead={dict.profile.timelineLead} />
+          <SectionHead id="timeline-title" eyebrow={dict.profile.timelineEyebrow} title={dict.profile.timeline} lead={dict.profile.timelineLead} />
           <ol className="timeline rv">
             {timeline(locale).map(([year, items]) => (
               <li key={year}>

@@ -1,245 +1,267 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRightIcon, FrameIcon } from "@/components/icons";
-import { AwardRow, FramedSlide, Metrics, MoreLink, ProjectCard, SectionHead, deckLockedCount, deckMatTone } from "@/components/ui";
+import type { ReactNode } from "react";
+import { CopyEmail } from "@/components/copy-email";
+import { ChevronRightIcon, GithubIcon, MailIcon } from "@/components/icons";
+import { StatusBadge } from "@/components/ui";
 import { decks } from "@/content/gallery";
-import { awards, profile } from "@/content/profile";
+import { awards, education, experience, profile, skills, type ResumeItem } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { tx, txList } from "@/content/types";
-import { hasLocale } from "@/i18n/config";
+import { hasLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { mailto } from "@/lib/site";
 
+/**
+ * 메인 — 링커리어 · 이력서형 포트폴리오처럼 단정하게. 장식(큰 그라데이션 글자 · 광원 · 등장 효과) 없이
+ * 프로필 카드(왼쪽, 데스크톱에서 고정) + 항목별 목록(오른쪽)으로 읽힌다. 화려한 전시는 갤러리가 맡는다.
+ */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
   const dict = getDictionary(locale);
-  const featured = projects.filter((p) => p.featured);
-  const firstAward = Math.min(...awards.map((a) => a.year));
+  const h = dict.home;
+
+  const sections = [
+    { id: "about", label: h.sections.about },
+    { id: "education", label: h.sections.education },
+    { id: "experience", label: h.sections.experience },
+    { id: "awards", label: h.sections.awards },
+    { id: "projects", label: h.sections.projects },
+    { id: "decks", label: h.sections.decks },
+    { id: "skills", label: h.sections.skills },
+  ];
 
   return (
-    <>
-      {/* ── 히어로 ── */}
-      <section className="relative overflow-hidden" aria-labelledby="hero-title">
-        <div className="glow" aria-hidden="true" />
-        <div className="wrap relative z-[1] pt-[clamp(72px,12vw,150px)] pb-[clamp(56px,8vw,96px)] text-center">
-          <p className="eyebrow eyebrow-muted rv">
-            <span className="dot" aria-hidden="true" />
-            {dict.home.eyebrow}
-          </p>
-          <h1 id="hero-title" className="h1 rv d1">
-            {dict.home.heroTitle[0]}
-            <br />
-            <span className="g-gold">{dict.home.heroTitle[1]}</span>
-          </h1>
-          <p className="copy rv d2 mx-auto mt-7 !max-w-[30em] !text-[clamp(18px,1.9vw,23px)]">
-            {dict.home.heroSub.before}
-            <b>{dict.home.heroSub.bold}</b>
-            {dict.home.heroSub.after}
-          </p>
-          <div className="rv d3 mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-4">
-            <Link href={`/${locale}/projects`} className="btn">
-              {dict.home.ctaProjects}
-            </Link>
-            <MoreLink href={`/${locale}/gallery`}>{dict.home.ctaGallery}</MoreLink>
-          </div>
-        </div>
-
-        <div className="wrap relative z-[1] pb-[clamp(40px,6vw,72px)]">
-          <ul className="stat-row rv">
-            <li>
-              <strong className="g-gold">
-                {awards.length}
-                <small>{locale === "ko" ? "회" : ""}</small>
-              </strong>
-              <span>{dict.home.stats.awards}</span>
-            </li>
-            <li>
-              <strong>
-                {projects.length}
-                <small>{locale === "ko" ? "개" : ""}</small>
-              </strong>
-              <span>{dict.home.stats.projects}</span>
-            </li>
-            <li>
-              <strong>
-                {decks.length}
-                <small>{locale === "ko" ? "점" : ""}</small>
-              </strong>
-              <span>{dict.home.stats.decks}</span>
-            </li>
-            <li>
-              <strong>{firstAward}</strong>
-              <span>{dict.home.stats.since}</span>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      {/* ── 프로필 벤토 ── */}
-      <section className="sec-tight" aria-labelledby="about-title">
-        <div className="wrap grid grid-cols-1 gap-[clamp(12px,1.6vw,20px)] md:grid-cols-6">
-          <article className="tile rv md:col-span-4">
-            <p className="kicker">About</p>
-            <h2 id="about-title" className="h3">
-              {tx(profile.name, locale)} <span className="text-muted-2">{tx(profile.altName, locale)}</span>
-            </h2>
-            <p className="mt-2 mb-0 text-[15px] font-bold text-gold-text">{tx(profile.role, locale)}</p>
-            <p className="body mt-5">{tx(profile.intro, locale)}</p>
-            <div className="mt-7">
-              <MoreLink href={`/${locale}/profile`}>{dict.home.profileTitle}</MoreLink>
+    <div className="wrap grid items-start gap-5 py-[clamp(20px,4vw,48px)] lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-8">
+      {/* ── 프로필 카드 ── */}
+      <aside className="lg:sticky lg:top-[calc(var(--nav-h)+24px)]">
+        <section className="r-card" aria-labelledby="name">
+          <div className="flex items-center gap-4 lg:flex-col lg:items-start">
+            <span className="grid h-[72px] w-[72px] flex-none place-items-center rounded-full bg-card-3 text-[26px] font-extrabold tracking-[-0.04em] text-ink" aria-hidden="true">
+              {locale === "ko" ? "강" : "K"}
+            </span>
+            <div className="min-w-0">
+              <h1 id="name" className="m-0 text-[26px] font-extrabold leading-tight tracking-[-0.035em]">
+                {tx(profile.name, locale)}{" "}
+                <span className="text-[17px] font-bold text-muted-2" lang={locale === "ko" ? "en" : "ko"}>
+                  {tx(profile.altName, locale)}
+                </span>
+              </h1>
+              <p className="m-0 mt-1 text-[14.5px] font-semibold text-muted">{tx(profile.role, locale)}</p>
             </div>
-          </article>
-          <article className="tile rv d1 flex flex-col md:col-span-2" style={{ background: "linear-gradient(160deg, var(--gold-wash), transparent 60%), var(--card)" }}>
-            <p className="kicker">{dict.profile.now}</p>
-            <p className="m-0 text-[clamp(19px,1.8vw,22px)] font-bold leading-snug tracking-[-0.03em]">{tx(profile.now, locale)}</p>
-          </article>
-          <article className="tile rv md:col-span-3">
-            <p className="kicker">{dict.profile.affiliations}</p>
-            <ul className="m-0 grid list-none gap-4 p-0">
-              {profile.affiliations.map((a) => (
-                <li key={a.name.ko}>
-                  <p className="m-0 text-[17px] font-bold tracking-[-0.02em]">{tx(a.name, locale)}</p>
-                  <p className="caption m-0 mt-0.5">{tx(a.detail, locale)}</p>
-                </li>
-              ))}
-            </ul>
-          </article>
-          <article className="tile rv d1 md:col-span-3">
-            <p className="kicker">{dict.profile.interests}</p>
-            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-              {txList(profile.interests, locale).map((i) => (
-                <li key={i} className="chip">
-                  {i}
-                </li>
-              ))}
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      {/* ── 수상 ── */}
-      <section className="sec-tight" aria-labelledby="awards-title">
-        <div className="wrap">
-          <SectionHead
-            id="awards-title"
-            eyebrow="Awards"
-            title={dict.home.awardsTitle}
-            action={<MoreLink href={`/${locale}/profile#awards`}>{dict.home.awardsMore}</MoreLink>}
-          />
-          <ol className="rv m-0 list-none border-b border-line p-0">
-            {awards.map((a) => (
-              <AwardRow key={`${a.year}-${a.event.ko}-${a.result.ko}`} award={a} locale={locale} dict={dict} />
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* ── 프로젝트 ── */}
-      <section className="sec-tight" aria-labelledby="projects-title">
-        <div className="wrap">
-          <SectionHead
-            id="projects-title"
-            eyebrow="Projects"
-            title={dict.home.projectsTitle}
-            lead={dict.home.projectsLead}
-            action={<MoreLink href={`/${locale}/projects`}>{dict.home.projectsMore}</MoreLink>}
-          />
-          <div className="grid grid-cols-1 gap-[clamp(12px,1.6vw,20px)] md:grid-cols-2">
-            {featured.map((p, i) => (
-              <div key={p.slug} className={`rv ${i === 0 ? "md:col-span-2" : i % 2 ? "d1" : "d2"}`}>
-                {i === 0 ? <FeaturedProject slug={p.slug} locale={locale} /> : <ProjectCard project={p} locale={locale} dict={dict} />}
+          </div>
+          <p className="m-0 mt-5 text-[15px] font-semibold leading-relaxed text-ink-2">{tx(profile.headline, locale)}</p>
+          <dl className="m-0 mt-5 grid gap-2.5 border-t border-line-2 pt-5 text-[14px]">
+            {profile.affiliations.slice(0, 2).map((a) => (
+              <div key={a.name.ko} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+                <dt className="font-semibold text-ink-2">{tx(a.name, locale)}</dt>
+                <dd className="m-0 text-muted-2">{tx(a.detail, locale).split(/\s·\s/)[0]}</dd>
               </div>
             ))}
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
+              <dt className="sr-only">{dict.contact.email}</dt>
+              <dd className="m-0 break-all font-semibold text-ink-2">{profile.email}</dd>
+            </div>
+          </dl>
+          <div className="mt-5 grid grid-cols-2 gap-2">
+            <a href={mailto(profile.email, dict.contact.mailSubject)} className="btn-solid">
+              <MailIcon size={17} />
+              {h.mail}
+            </a>
+            <CopyEmail email={profile.email} label={dict.contact.copy} done={dict.contact.copied} className="btn-line" />
           </div>
-        </div>
-      </section>
+          <a href={profile.github} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-muted-2 hover:text-ink">
+            <GithubIcon size={16} /> github.com/kanghea
+          </a>
 
-      {/* ── 갤러리 예고 ── */}
-      <section className="museum wall sec mt-[clamp(32px,5vw,64px)]" aria-labelledby="gallery-title">
-        <div className="wrap">
-          <SectionHead
-            id="gallery-title"
-            center
-            eyebrow={
-              <>
-                <FrameIcon size={18} /> Presentation Gallery
-              </>
-            }
-            title={dict.home.galleryTitle}
-            lead={dict.home.galleryLead}
-          />
-          <div className="grid grid-cols-1 gap-[clamp(28px,4vw,48px)] md:grid-cols-2">
-            {decks.map((d, i) => {
+          <ul className="m-0 mt-5 grid list-none grid-cols-3 border-t border-line-2 p-0 pt-4 text-center">
+            {[
+              { n: awards.length, label: h.sections.awards, href: "#awards" },
+              { n: projects.length, label: h.sections.projects, href: "#projects" },
+              { n: decks.length, label: h.sections.decks, href: "#decks" },
+            ].map((c) => (
+              <li key={c.href}>
+                <a href={c.href} className="block rounded-xl py-1.5 hover:bg-card-2">
+                  <span className="num block text-[20px] font-extrabold tracking-[-0.03em]">{c.n}</span>
+                  <span className="block text-[12.5px] font-semibold text-muted-2">{c.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <nav className="r-card mt-4 hidden !py-3 lg:block" aria-label={h.quickNav}>
+          <ul className="m-0 list-none p-0">
+            {sections.map((s) => (
+              <li key={s.id}>
+                <a href={`#${s.id}`} className="flex items-center justify-between rounded-lg px-2 py-2 text-[14px] font-semibold text-ink-2 hover:bg-card-2 hover:text-ink">
+                  {s.label}
+                  <ChevronRightIcon size={15} className="text-muted-2" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+
+      {/* ── 항목 ── */}
+      <div className="grid gap-4">
+        <ResumeSection id="about" title={h.sections.about}>
+          <p className="m-0 text-[15.5px] leading-[1.75] text-ink-2">{tx(profile.intro, locale)}</p>
+          <p className="m-0 mt-3 text-[15.5px] leading-[1.75] text-ink-2">{tx(profile.now, locale)}</p>
+        </ResumeSection>
+
+        <ResumeSection id="education" title={h.sections.education}>
+          <Rows items={education} locale={locale} />
+        </ResumeSection>
+
+        <ResumeSection id="experience" title={h.sections.experience} count={experience.length}>
+          <Rows items={experience} locale={locale} />
+        </ResumeSection>
+
+        <ResumeSection id="awards" title={h.sections.awards} count={awards.length}>
+          <ul className="m-0 list-none p-0">
+            {awards.map((a) => (
+              <li key={`${a.year}-${a.event.ko}-${a.result.ko}`} className="r-row">
+                <div className="min-w-0">
+                  <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15.5px] font-bold tracking-[-0.02em]">
+                    {tx(a.event, locale)}
+                    <span className="badge badge-gold">{tx(a.result, locale)}</span>
+                    {a.honor && <span className="text-[13px] font-semibold text-muted-2">{tx(a.honor, locale)}</span>}
+                  </p>
+                  {a.summary && <p className="m-0 mt-1 text-[14px] leading-relaxed text-muted-2">{tx(a.summary, locale)}</p>}
+                </div>
+                <span className="r-period">{a.year}</span>
+              </li>
+            ))}
+          </ul>
+        </ResumeSection>
+
+        <ResumeSection id="projects" title={h.sections.projects} count={projects.length} action={{ href: `/${locale}/projects`, label: h.viewAll }}>
+          <ul className="m-0 list-none p-0">
+            {projects.map((p) => (
+              <li key={p.slug}>
+                <Link href={`/${locale}/projects/${p.slug}`} className="r-row group">
+                  <div className="min-w-0">
+                    <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15.5px] font-bold tracking-[-0.02em]">
+                      <span className="group-hover:underline group-hover:underline-offset-4">{tx(p.name, locale)}</span>
+                      <StatusBadge status={p.status} dict={dict} />
+                    </p>
+                    <p className="m-0 mt-1 text-[14px] leading-relaxed text-muted-2">{tx(p.tagline, locale)}</p>
+                    <p className="m-0 mt-1 text-[13px] font-semibold text-muted">{tx(p.role, locale)}</p>
+                  </div>
+                  <span className="r-period">
+                    {p.period ? tx(p.period, locale) : ""}
+                    <ChevronRightIcon size={15} className="ml-1 hidden text-muted-2 sm:inline" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </ResumeSection>
+
+        <ResumeSection id="decks" title={h.sections.decks} count={decks.length} action={{ href: `/${locale}/gallery`, label: h.toGallery }}>
+          <p className="m-0 mb-1 text-[14px] leading-relaxed text-muted-2">{h.decksLead}</p>
+          <ul className="m-0 list-none p-0">
+            {decks.map((d) => {
               const cover = d.manifest.previews[0];
               return (
-                <Link key={d.slug} href={`/${locale}/gallery/${d.slug}`} className={`rv group block ${i ? "d1" : ""}`}>
-                  <div className="relative">
-                    <div className="spot" aria-hidden="true" />
-                    <div className="transition-transform duration-500 ease-out group-hover:-translate-y-1">
-                      <FramedSlide
-                        src={cover.src}
-                        width={cover.width}
-                        height={cover.height}
-                        alt={tx(d.title, locale)}
-                        sizes="(min-width: 900px) 540px, 100vw"
-                        mat={deckMatTone(d)}
-                      />
+                <li key={d.slug}>
+                  <Link href={`/${locale}/gallery/${d.slug}`} className="r-row group !grid-cols-[96px_minmax(0,1fr)_auto] items-center sm:!grid-cols-[128px_minmax(0,1fr)_auto]">
+                    <span className="block overflow-hidden rounded-lg border border-line-2 bg-card-2">
+                      <Image src={cover.src} width={cover.width} height={cover.height} alt="" sizes="128px" className="aspect-video w-full object-cover" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15.5px] font-bold tracking-[-0.02em]">
+                        <span className="group-hover:underline group-hover:underline-offset-4">{tx(d.title, locale)}</span>
+                        {d.result && <span className="badge badge-gold">{tx(d.result, locale)}</span>}
+                      </p>
+                      <p className="m-0 mt-1 text-[14px] leading-relaxed text-muted-2">{tx(d.usedFor, locale)}</p>
+                      <p className="m-0 mt-1 text-[13px] font-semibold text-muted">
+                        {d.manifest.slideCount}
+                        {locale === "ko" ? "장" : " slides"} · {dict.gallery.preview} {d.manifest.previews.length}
+                      </p>
                     </div>
-                  </div>
-                  <div className="placard mx-auto mt-6 max-w-[360px]">
-                    <p className="m-0 text-[12px] font-extrabold tracking-[0.14em] text-[#8a6a2a]">
-                      {dict.gallery.lot} {String(d.lot).padStart(2, "0")} · {d.year}
-                    </p>
-                    <p className="m-0 mt-1 text-[19px] font-extrabold tracking-[-0.03em]">{tx(d.title, locale)}</p>
-                    <p className="muted m-0 mt-1 text-[13.5px] font-semibold">
-                      {d.result ? `${tx(d.result, locale)} · ` : ""}
-                      {d.manifest.slideCount}
-                      {locale === "ko" ? "장" : " slides"} · {dict.gallery.locked} {deckLockedCount(d)}
-                    </p>
-                  </div>
-                </Link>
+                    <span className="r-period">{d.year}</span>
+                  </Link>
+                </li>
               );
             })}
-          </div>
-          <div className="rv mt-14 text-center">
-            <Link href={`/${locale}/gallery`} className="btn">
-              {dict.home.galleryMore}
-              <ArrowRightIcon size={18} />
-            </Link>
-          </div>
-        </div>
-      </section>
-    </>
+          </ul>
+        </ResumeSection>
+
+        <ResumeSection id="skills" title={h.sections.skills}>
+          <SkillGroup label={h.skillsDev} items={skills.dev} />
+          <SkillGroup label={h.skillsBiz} items={txList(skills.biz, locale)} />
+          <SkillGroup label={h.interests} items={txList(profile.interests, locale)} />
+        </ResumeSection>
+      </div>
+    </div>
   );
 }
 
-/** 첫 프로젝트는 가로로 넓게 — 표지 + 지표. */
-function FeaturedProject({ slug, locale }: { slug: string; locale: "ko" | "en" }) {
-  const project = projects.find((p) => p.slug === slug)!;
-  const dict = getDictionary(locale);
+function ResumeSection({ id, title, count, action, children }: { id: string; title: string; count?: number; action?: { href: string; label: string }; children: ReactNode }) {
   return (
-    <Link href={`/${locale}/projects/${project.slug}`} className="tile tile-link group grid !p-0 md:grid-cols-[1.15fr_1fr]">
-      <div className="relative aspect-[1200/630] overflow-hidden border-b border-line-2 bg-black md:aspect-auto md:min-h-[380px] md:border-r md:border-b-0">
-        {project.cover && (
-          <Image
-            src={project.cover.src}
-            alt={tx(project.cover.alt, locale)}
-            fill
-            sizes="(min-width: 900px) 600px, 100vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] md:object-contain"
-          />
+    <section id={id} className="r-card scroll-mt-[calc(var(--nav-h)+16px)]" aria-labelledby={`${id}-title`}>
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 id={`${id}-title`} className="m-0 text-[18px] font-extrabold tracking-[-0.03em]">
+          {title}
+          {count !== undefined && <span className="num ml-1.5 text-[15px] font-bold text-muted-2">{count}</span>}
+        </h2>
+        {action && (
+          <Link href={action.href} className="inline-flex items-center gap-0.5 text-[13.5px] font-semibold text-muted-2 hover:text-ink">
+            {action.label}
+            <ChevronRightIcon size={15} />
+          </Link>
         )}
       </div>
-      <div className="flex flex-col p-7 md:p-10">
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className={`badge badge-${project.status}`}>{dict.projects.status[project.status]}</span>
-          {project.period && <span className="caption num">{tx(project.period, locale)}</span>}
-        </div>
-        <h3 className="h3">{tx(project.name, locale)}</h3>
-        <p className="mt-3 mb-0 text-[16.5px] font-semibold leading-relaxed text-muted-2">{tx(project.summary, locale)}</p>
-        {project.metrics && <Metrics metrics={project.metrics.slice(0, 4)} locale={locale} className="mt-auto grid-cols-2 pt-8" />}
-      </div>
-    </Link>
+      {children}
+    </section>
+  );
+}
+
+function Rows({ items, locale }: { items: ResumeItem[]; locale: Locale }) {
+  return (
+    <ul className="m-0 list-none p-0">
+      {items.map((it) => {
+        const body = (
+          <>
+            <div className="min-w-0">
+              <p className="m-0 text-[15.5px] font-bold tracking-[-0.02em]">{tx(it.title, locale)}</p>
+              {it.sub && <p className="m-0 mt-1 text-[14px] leading-relaxed text-muted-2">{tx(it.sub, locale)}</p>}
+            </div>
+            <span className="r-period">{tx(it.period, locale)}</span>
+          </>
+        );
+        return (
+          <li key={it.title.ko}>
+            {it.href ? (
+              <Link href={`/${locale}${it.href}`} className="r-row">
+                {body}
+              </Link>
+            ) : (
+              <div className="r-row">{body}</div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function SkillGroup({ label, items }: { label: string; items: string[] }) {
+  return (
+    <div className="grid gap-2 border-t border-line-2 py-3.5 first:border-t-0 first:pt-1 sm:grid-cols-[96px_minmax(0,1fr)] sm:gap-4">
+      <p className="m-0 pt-1 text-[13.5px] font-bold text-muted">{label}</p>
+      <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
+        {items.map((s) => (
+          <li key={s} className="chip !min-h-[28px] !bg-card-2 !px-2.5 !text-[13px]">
+            {s}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

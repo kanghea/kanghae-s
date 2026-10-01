@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { locales, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { profile } from "@/content/profile";
 import type { SitePath } from "./site";
 
 const ogLocale: Record<Locale, string> = { ko: "ko_KR", en: "en_US" };
@@ -19,8 +20,11 @@ type Options = {
 export function pageMetadata(locale: Locale, path: SitePath, opts: Options): Metadata {
   const dict = getDictionary(locale);
   const languages = Object.fromEntries(locales.map((l) => [l, `/${l}${path}`])) as Record<string, string>;
-  languages["x-default"] = `/ko${path}`;
+  // 언어를 모르는 방문자: 홈은 '/'(브라우저 언어로 나눈다), 나머지는 영어판.
+  languages["x-default"] = path === "" ? "/" : `/en${path}`;
   const image = opts.image ?? { ...DEFAULT_OG, alt: dict.meta.title };
+  // 공유 미리보기(카카오톡 · 링크드인)에도 이름이 보이게 — <title> 템플릿은 OG 에 적용되지 않는다.
+  const shareTitle = opts.absoluteTitle ? opts.title : `${opts.title} — ${profile.name[locale]}`;
   return {
     title: opts.absoluteTitle ? { absolute: opts.title } : opts.title,
     description: opts.description,
@@ -28,7 +32,7 @@ export function pageMetadata(locale: Locale, path: SitePath, opts: Options): Met
     openGraph: {
       type: "website",
       siteName: dict.meta.siteName,
-      title: opts.title,
+      title: shareTitle,
       description: opts.description,
       url: `/${locale}${path}`,
       locale: ogLocale[locale],
@@ -37,7 +41,7 @@ export function pageMetadata(locale: Locale, path: SitePath, opts: Options): Met
     },
     twitter: {
       card: "summary_large_image",
-      title: opts.title,
+      title: shareTitle,
       description: opts.description,
       images: [image.url],
     },

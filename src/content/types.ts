@@ -1,15 +1,16 @@
 import type { Locale } from "@/i18n/config";
+import { glue } from "@/lib/text";
 
 /** 한 항목의 한국어·영어 문구. 두 언어를 나란히 적어 한쪽만 고치는 실수를 막는다. */
 export type L10n = Record<Locale, string>;
 export type L10nList = Record<Locale, string[]>;
 
-export const tx = (value: L10n, locale: Locale): string => value[locale];
+export const tx = (value: L10n, locale: Locale): string => glue(value[locale]);
 /** 숫자처럼 언어와 무관한 값은 문자열 그대로, 단위가 붙는 값은 L10n 으로 적는다. */
-export const txv = (value: string | L10n, locale: Locale): string => (typeof value === "string" ? value : value[locale]);
+export const txv = (value: string | L10n, locale: Locale): string => glue(typeof value === "string" ? value : value[locale]);
 
 export type Metric = { value: string | L10n; label: L10n };
-export const txList = (value: L10nList, locale: Locale): string[] => value[locale];
+export const txList = (value: L10nList, locale: Locale): string[] => value[locale].map(glue);
 
 export type Award = {
   year: number;
@@ -89,6 +90,8 @@ export type Deck = {
   /** 덱 제작에서 맡은 일 */
   role: L10n;
   team?: L10n;
+  /** 덱 제작 주체 — 공동 제작이면 적는다(맡은 일과 구분) */
+  credit?: L10n;
   /** 도록 해설 */
   note: L10n;
   /** 목차(챕터) */

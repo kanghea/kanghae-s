@@ -69,13 +69,10 @@ export function ProjectCover({ project, locale, sizes, preload }: { project: Pro
   return <div className="h-full w-full bg-card-2" aria-hidden="true" />;
 }
 
-export function ProjectCard({ project, locale, dict, large }: { project: Project; locale: Locale; dict: Dictionary; large?: boolean }) {
+export function ProjectCard({ project, locale, dict, large, headingLevel = 3 }: { project: Project; locale: Locale; dict: Dictionary; large?: boolean; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
-    <Link
-      href={`/${locale}/projects/${project.slug}`}
-      className="tile tile-link group flex h-full flex-col !p-0"
-      aria-label={`${tx(project.name, locale)} — ${tx(project.tagline, locale)}`}
-    >
+    <Link href={`/${locale}/projects/${project.slug}`} className="tile tile-link group flex h-full flex-col !p-0">
       <div className="relative aspect-[16/9] overflow-hidden border-b border-line-2 bg-card-2">
         <div className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]">
           <ProjectCover project={project} locale={locale} sizes={large ? "(min-width: 900px) 640px, 100vw" : "(min-width: 900px) 360px, (min-width: 640px) 50vw, 100vw"} />
@@ -86,7 +83,7 @@ export function ProjectCard({ project, locale, dict, large }: { project: Project
           <StatusBadge status={project.status} dict={dict} />
           {project.period && <span className="caption num">{tx(project.period, locale)}</span>}
         </div>
-        <h3 className={large ? "h3" : "h4 !text-[clamp(21px,2vw,26px)]"}>{tx(project.name, locale)}</h3>
+        <Heading className={large ? "h3" : "h4 !text-[clamp(21px,2vw,26px)]"}>{tx(project.name, locale)}</Heading>
         <p className="mt-2 text-[15.5px] font-semibold leading-relaxed text-muted-2">{tx(project.tagline, locale)}</p>
         <p className="mt-auto pt-5 text-[13.5px] font-semibold text-ink-2">
           <span className="text-muted-2">{dict.projects.role} · </span>
@@ -99,7 +96,7 @@ export function ProjectCard({ project, locale, dict, large }: { project: Project
 
 export function AwardRow({ award, locale, dict, detailed }: { award: Award; locale: Locale; dict: Dictionary; detailed?: boolean }) {
   return (
-    <li className="grid grid-cols-[64px_minmax(0,1fr)] gap-4 border-t border-line py-6 sm:grid-cols-[96px_minmax(0,1fr)_auto] sm:items-baseline">
+    <li className="grid grid-cols-[64px_minmax(0,1fr)] gap-x-4 gap-y-3 border-t border-line py-6 sm:grid-cols-[96px_minmax(0,1fr)] lg:grid-cols-[96px_minmax(0,1fr)_minmax(0,15rem)] lg:items-baseline">
       <span className="num text-[clamp(22px,2.4vw,30px)] font-extrabold tracking-[-0.04em] g-gold">{award.year}</span>
       <div>
         <p className="m-0 text-[clamp(18px,1.7vw,21px)] font-bold tracking-[-0.03em]">{tx(award.event, locale)}</p>
@@ -111,9 +108,9 @@ export function AwardRow({ award, locale, dict, detailed }: { award: Award; loca
           </Link>
         )}
       </div>
-      <div className="col-start-2 flex flex-wrap gap-2 sm:col-start-3 sm:justify-end">
+      <div className="col-start-2 flex flex-wrap gap-2 lg:col-start-3 lg:justify-end">
         <span className="badge badge-gold">{tx(award.result, locale)}</span>
-        {award.honor && <span className="chip !min-h-0 !py-0.5">{tx(award.honor, locale)}</span>}
+        {award.honor && <span className="chip !min-h-0 !whitespace-normal !py-0.5">{tx(award.honor, locale)}</span>}
       </div>
     </li>
   );
@@ -164,7 +161,7 @@ export function VeiledSlide({ dataUrl, slide, label }: { dataUrl: string; slide:
 /** 숫자 지표 — 큰 골드 숫자 + 설명. dt(설명)를 먼저 두고 화면에서는 숫자를 위로 올린다. */
 export function Metrics({ metrics, locale, className = "" }: { metrics: Metric[]; locale: Locale; className?: string }) {
   return (
-    <dl className={`m-0 grid gap-x-6 gap-y-5 ${className}`}>
+    <dl className={`m-0 grid items-start gap-x-6 gap-y-5 ${className}`}>
       {metrics.map((m) => (
         <div key={m.label.ko} className="flex flex-col-reverse">
           <dt className="caption mt-1 !text-[13.5px] leading-snug">{tx(m.label, locale)}</dt>

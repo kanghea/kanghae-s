@@ -42,7 +42,7 @@ export default async function LotPage({ params }: PageProps<"/[locale]/gallery/[
   const locked = deckLockedCount(deck);
   const project = deck.project ? getProject(deck.project) : undefined;
   const nextDeck = decks[(decks.indexOf(deck) + 1) % decks.length];
-  const inquire = mailto(profile.email, `${dict.contact.commissionSubject}${tx(deck.title, locale)}`, fmt(dict.contact.deckBody, { title: tx(deck.title, locale), lot: lotNo }));
+  const inquire = mailto(profile.email, fmt(g.inquirySubject, { title: tx(deck.title, locale), lot: lotNo }), fmt(dict.contact.deckBody, { title: tx(deck.title, locale), lot: lotNo }));
 
   const slides: ViewerSlide[] = Array.from({ length: deck.manifest.slideCount }, (_, i) => {
     const n = i + 1;
@@ -58,15 +58,16 @@ export default async function LotPage({ params }: PageProps<"/[locale]/gallery/[
     ...(deck.result ? ([[g.result, tx(deck.result, locale)]] as [string, string][]) : []),
     [g.role, tx(deck.role, locale)],
     ...(deck.team ? ([[g.team, tx(deck.team, locale)]] as [string, string][]) : []),
+    ...(deck.credit ? ([[g.credit, tx(deck.credit, locale)]] as [string, string][]) : []),
     [g.medium, tx(deck.medium, locale)],
-    [g.slideCount, `${deck.manifest.slideCount}${locale === "ko" ? "장" : ` ${g.slides}`} · ${g.preview} ${deck.manifest.previews.length} · ${g.locked} ${locked}`],
+    [g.slideCount, fmt(g.slideSummary, { total: deck.manifest.slideCount, open: deck.manifest.previews.length, locked })],
     [g.estimate, g.estimateValue],
   ];
 
   return (
     <div className="museum wall -mb-px">
       <div className="wrap pt-[clamp(28px,5vw,56px)]">
-        <Link href={`/${locale}/gallery`} className="caption inline-flex items-center gap-1.5 hover:text-ink">
+        <Link href={`/${locale}/gallery`} className="caption -my-2 inline-flex min-h-10 items-center gap-1.5 hover:text-ink">
           <ArrowLeftIcon size={16} />
           {g.back}
         </Link>
@@ -108,17 +109,17 @@ export default async function LotPage({ params }: PageProps<"/[locale]/gallery/[
       <section className="wrap grid gap-[clamp(28px,4vw,56px)] py-[clamp(56px,8vw,104px)] lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <div>
           <div className="rv">
-            <p className="eyebrow">{g.curatorNote}</p>
+            <h2 className="eyebrow">{g.curatorNote}</h2>
             <p className="body !text-[clamp(17px,1.5vw,19px)] !leading-[1.8]">{tx(deck.note, locale)}</p>
           </div>
           {deck.highlights && (
             <div className="rv mt-12">
-              <p className="eyebrow">{g.highlights}</p>
+              <h2 className="eyebrow">{g.highlights}</h2>
               <Metrics metrics={deck.highlights} locale={locale} className="grid-cols-1 border-t border-line pt-6 sm:grid-cols-3" />
             </div>
           )}
           <div className="rv mt-12">
-            <p className="eyebrow">{g.chapters}</p>
+            <h2 className="eyebrow">{g.chapters}</h2>
             <ol className="m-0 grid list-none gap-0 border-t border-line p-0">
               {txList(deck.chapters, locale).map((c, i) => (
                 <li key={c} className="grid grid-cols-[44px_minmax(0,1fr)] items-baseline border-b border-line py-3.5">
@@ -133,13 +134,16 @@ export default async function LotPage({ params }: PageProps<"/[locale]/gallery/[
 
         <aside className="lg:sticky lg:top-[calc(var(--nav-h)+24px)] lg:self-start">
           <div className="placard rv !p-[clamp(20px,2.4vw,28px)]">
-            <p className="m-0 text-[12.5px] font-extrabold tracking-[0.16em] text-[#8a6a2a]">
+            <p className="placard-lot m-0 text-[12.5px] font-extrabold tracking-[0.16em]">
               {g.lot} {lotNo}
             </p>
-            <p className="m-0 mt-2 text-[24px] font-extrabold tracking-[-0.04em]">{tx(deck.title, locale)}</p>
+            <h2 className="m-0 mt-2 text-[24px] font-extrabold tracking-[-0.04em]">
+              <span className="sr-only">{g.facts} — </span>
+              {tx(deck.title, locale)}
+            </h2>
             <dl className="m-0 mt-4 grid border-t border-black/10 text-[14px]">
               {facts.map(([k, v]) => (
-                <div key={k} className="grid grid-cols-[76px_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
+                <div key={k} className="grid grid-cols-[minmax(76px,max-content)_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
                   <dt className="muted font-bold">{k}</dt>
                   <dd className="m-0 font-semibold leading-relaxed">{v}</dd>
                 </div>

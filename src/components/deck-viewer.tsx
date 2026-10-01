@@ -32,6 +32,8 @@ const pad = (n: number) => String(n).padStart(2, "0");
 export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title: string; slides: ViewerSlide[]; mat: "light" | "dark"; inquireHref: string; labels: Labels }) {
   const [index, setIndex] = useState(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const total = slides.length;
   const current = slides[index];
   const previews = slides.filter((s) => s.kind === "preview").length;
@@ -55,13 +57,22 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
     return () => window.removeEventListener("keydown", onKey);
   }, [go]);
 
-  // 크게 보기 중 비공개 장으로 넘어가면 창을 닫고 무대의 잠금 안내를 보여 준다.
+  // 크게 보기 중 비공개 장으로 넘어가면 창을 닫고, 포커스를 무대(잠금 안내)로 옮긴다 — 열었던 버튼은 이미 사라졌다.
   useEffect(() => {
-    if (current.kind === "locked" && dialogRef.current?.open) dialogRef.current.close();
+    if (current.kind === "locked" && dialogRef.current?.open) {
+      dialogRef.current.close();
+      stageRef.current?.focus();
+    }
   }, [current]);
 
   const openLightbox = () => {
-    if (current.kind === "preview") dialogRef.current?.showModal();
+    if (current.kind !== "preview" || !dialogRef.current) return;
+    dialogRef.current.showModal();
+    document.documentElement.style.overflow = "hidden"; // 뒤 페이지가 휠로 스크롤되지 않게
+    closeRef.current?.focus();
+  };
+  const onDialogClose = () => {
+    document.documentElement.style.overflow = "";
   };
 
   const slideLabel = (n: number) => labels.slideOf.replace("{n}", String(n));
@@ -77,9 +88,14 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
         <div className="spot" aria-hidden="true" />
         <div className="frame">
           <div className={`frame-mat ${mat === "dark" ? "dark-mat" : ""}`}>
-            <div className="relative aspect-video overflow-hidden bg-black" aria-live="polite">
+            <div ref={stageRef} tabIndex={-1} className="relative aspect-video overflow-hidden bg-black outline-none" aria-live="polite">
               {current.kind === "preview" ? (
-                <button type="button" onClick={openLightbox} className="group block h-full w-full cursor-zoom-in" aria-label={`${slideLabel(current.slide)} — ${labels.open}`}>
+                <button
+                  type="button"
+                  onClick={openLightbox}
+                  className="group block h-full w-full cursor-zoom-in focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-[var(--gold)]"
+                  aria-label={`${slideLabel(current.slide)} — ${labels.open}`}
+                >
                   <Image
                     key={current.src}
                     src={current.src}
@@ -91,21 +107,21 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
                     preload={index === 0}
                     className="h-full w-full object-contain"
                   />
-                  <span className="absolute right-3 bottom-3 hidden items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5 text-[12.5px] font-bold text-white backdrop-blur group-hover:inline-flex sm:inline-flex">
+                  <span className="absolute right-3 bottom-3 hidden items-center gap-1.5 rounded-full bg-black/65 px-3 py-1.5 text-[12.5px] font-bold text-white backdrop-blur sm:inline-flex">
                     <ExpandIcon size={14} /> {labels.open}
                   </span>
                 </button>
               ) : (
                 <div className="absolute inset-0">
                   <div className="veil" style={{ backgroundImage: `url(${current.dataUrl})` }} aria-hidden="true" />
-                  <div className="absolute inset-0 grid place-items-center bg-black/45 p-6 text-center backdrop-blur-sm">
-                    <div className="max-w-[420px]">
-                      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-white/25 bg-black/40 text-[var(--gold)]">
-                        <LockIcon size={22} />
+                  <div className="absolute inset-0 grid place-items-center bg-black/65 p-3 text-center backdrop-blur-sm sm:p-6">
+                    <div className="max-w-[440px]">
+                      <span className="mx-auto grid h-9 w-9 place-items-center rounded-full border border-white/30 bg-black/50 text-[var(--gold)] sm:h-12 sm:w-12">
+                        <LockIcon size={18} />
                       </span>
-                      <p className="mt-4 mb-0 text-[clamp(17px,2.2vw,22px)] font-extrabold tracking-[-0.03em] text-white">{labels.lockedTitle}</p>
-                      <p className="mt-2 mb-0 hidden text-[14.5px] font-semibold leading-relaxed text-white/75 sm:block">{labels.lockedBody}</p>
-                      <a href={inquireHref} className="btn btn-sm mt-5">
+                      <p className="mt-2.5 mb-0 text-[15px] font-extrabold tracking-[-0.03em] text-white sm:mt-4 sm:text-[clamp(17px,2.2vw,22px)]">{labels.lockedTitle}</p>
+                      <p className="mt-2 mb-0 hidden text-[14.5px] font-semibold leading-relaxed text-white/90 sm:block">{labels.lockedBody}</p>
+                      <a href={inquireHref} className="btn btn-sm mt-5 !hidden sm:!inline-flex">
                         <MailIcon size={16} /> {labels.inquire}
                       </a>
                     </div>
@@ -116,6 +132,16 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
           </div>
         </div>
       </div>
+
+      {/* 모바일: 무대가 좁아 문의 버튼을 아래로 뺀다 */}
+      {current.kind === "locked" && (
+        <div className="mt-4 rounded-2xl border border-line bg-card px-4 py-3.5 sm:hidden">
+          <p className="m-0 text-[14px] font-semibold leading-relaxed text-ink-2">{labels.lockedBody}</p>
+          <a href={inquireHref} className="btn btn-sm mt-3 w-full">
+            <MailIcon size={16} /> {labels.inquire}
+          </a>
+        </div>
+      )}
 
       {/* 넘기기 */}
       <div className="mt-6 flex items-center justify-between gap-4">
@@ -147,12 +173,12 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
               onClick={() => setIndex(i)}
               aria-current={i === index ? "true" : undefined}
               aria-label={s.kind === "preview" ? slideLabel(s.slide) : `${slideLabel(s.slide)} — ${labels.lockedSlide}`}
-              className={`relative block w-full overflow-hidden rounded-[6px] outline-offset-2 transition ${i === index ? "ring-2 ring-[var(--gold)]" : "opacity-80 hover:opacity-100"}`}
+              className={`thumb relative block w-full overflow-hidden rounded-[6px] transition ${i === index ? "ring-[3px] ring-[var(--gold)]" : "opacity-80 hover:opacity-100"}`}
             >
               {s.kind === "preview" ? (
                 <span className="relative block aspect-video bg-black">
                   <Image src={s.src} width={s.width} height={s.height} alt="" sizes="160px" className="h-full w-full object-cover" />
-                  <span className="num absolute left-1.5 top-1 rounded bg-black/55 px-1 text-[10.5px] font-bold text-white">{pad(s.slide)}</span>
+                  <span className="num absolute left-1.5 top-1 rounded bg-black/65 px-1 text-[10.5px] font-bold text-white">{pad(s.slide)}</span>
                 </span>
               ) : (
                 <span className="relative block aspect-video overflow-hidden bg-card-2">
@@ -160,7 +186,7 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
                   <span className="lock-glass">
                     <LockIcon size={15} />
                   </span>
-                  <span className="num absolute left-1.5 top-1 text-[10.5px] font-bold text-white/80">{pad(s.slide)}</span>
+                  <span className="num absolute left-1.5 top-1 rounded bg-black/65 px-1 text-[10.5px] font-bold text-white">{pad(s.slide)}</span>
                 </span>
               )}
             </button>
@@ -171,28 +197,32 @@ export function DeckViewer({ title, slides, mat, inquireHref, labels }: { title:
       {/* 크게 보기 */}
       <dialog
         ref={dialogRef}
-        className="m-auto max-h-none max-w-none bg-transparent p-0 backdrop:bg-black/90 backdrop:backdrop-blur-sm"
+        onClose={onDialogClose}
+        className="m-auto max-h-none max-w-none overscroll-contain bg-transparent p-0 backdrop:bg-black/90 backdrop:backdrop-blur-sm"
         aria-label={title}
         onClick={(e) => {
           if (e.target === dialogRef.current) dialogRef.current?.close();
         }}
       >
-        {current.kind === "preview" && (
-          <div className="relative w-[min(96vw,calc(92vh*16/9))]">
+        <div className="relative w-[min(96vw,calc((92dvh-64px)*16/9))]">
+          {current.kind === "preview" && (
             <Image src={current.src} width={current.width} height={current.height} alt={`${title} — ${slideLabel(current.slide)}`} sizes="96vw" quality={90} className="w-full rounded-md" />
-            <div className="mt-3 flex items-center justify-center gap-3">
-              <button type="button" className="icon-btn !border-white/20 !text-white" onClick={() => go(-1)} aria-label={labels.prev}>
-                <ChevronLeftIcon />
-              </button>
-              <button type="button" className="icon-btn !border-white/20 !text-white" onClick={() => dialogRef.current?.close()} aria-label={labels.close} autoFocus>
-                <CloseIcon />
-              </button>
-              <button type="button" className="icon-btn !border-white/20 !text-white" onClick={() => go(1)} aria-label={labels.next}>
-                <ChevronRightIcon />
-              </button>
-            </div>
+          )}
+          <div className="mt-3 flex items-center justify-center gap-3">
+            <button type="button" className="icon-btn !border-white/25 !text-white" onClick={() => go(-1)} aria-label={labels.prev}>
+              <ChevronLeftIcon />
+            </button>
+            <span className="num min-w-[64px] text-center text-[14px] font-bold text-white/85">
+              {pad(current.slide)} / {pad(total)}
+            </span>
+            <button ref={closeRef} type="button" className="icon-btn !border-white/25 !text-white" onClick={() => dialogRef.current?.close()} aria-label={labels.close}>
+              <CloseIcon />
+            </button>
+            <button type="button" className="icon-btn !border-white/25 !text-white" onClick={() => go(1)} aria-label={labels.next}>
+              <ChevronRightIcon />
+            </button>
           </div>
-        )}
+        </div>
       </dialog>
     </div>
   );
