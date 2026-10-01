@@ -1,11 +1,6 @@
 {
  "slug": "battleview-3d",
  "slideCount": 17,
- "aspectRatio": [
-  12192000,
-  6858000
- ],
- "source": "libreoffice",
  "previews": [
   {
    "slide": 1,
@@ -26,6 +21,11 @@
    "height": 1080
   }
  ],
+ "og": {
+  "src": "/gallery/battleview-3d/og.jpg",
+  "width": 1200,
+  "height": 630
+ },
  "veils": [
   {
    "slide": 4,

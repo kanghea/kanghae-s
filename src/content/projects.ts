@@ -113,7 +113,6 @@ export const projects: Project[] = [
       { src: "/projects/junggaesacoach/screen-report.webp", width: 900, height: 1951, alt: { ko: "과목별 예상 점수 리포트", en: "Predicted-score report by subject" } },
       { src: "/projects/junggaesacoach/screen-level-result.webp", width: 900, height: 1951, alt: { ko: "레벨 테스트 결과", en: "Level-test result" } },
     ],
-    featured: true,
   },
   {
     slug: "battleview-3d",
@@ -206,7 +205,6 @@ export const projects: Project[] = [
       alt: { ko: "BattleView 3D 발표자료 표지", en: "BattleView 3D deck cover" },
     },
     deck: "battleview-3d",
-    featured: true,
   },
   {
     slug: "gochiso",
@@ -292,7 +290,6 @@ export const projects: Project[] = [
       alt: { ko: "고치소 발표자료 표지", en: "Gochiso deck cover" },
     },
     deck: "gochiso",
-    featured: true,
   },
   {
     slug: "seomun12",

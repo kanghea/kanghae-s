@@ -51,7 +51,7 @@ export const experience: ResumeItem[] = [
   },
   {
     title: { ko: "KNU 싱크탱크 · 고치소 팀", en: "KNU Think Tank · Gochiso team" },
-    sub: { ko: "팀장 · 사업 총괄 — 사용자 인터뷰 37명, 서비스 구조 · BM · 발표", en: "Team lead · business lead — 37 user interviews, service design, business model, pitch" },
+    sub: { ko: "팀장 · 사업 총괄 — 사용자 인터뷰 37명, 서비스 구조 · 비즈니스 모델 · 발표", en: "Team lead · business lead — 37 user interviews, service design, business model, pitch" },
     period: { ko: "2026", en: "2026" },
     href: "/projects/gochiso",
   },

@@ -50,6 +50,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
         {/* Pretendard 가변 글꼴 동적 서브셋 — 화면에 쓰인 글자 조각만 받는다(중개사코치와 같은 파일).
             CSS 번들에 넣으면 woff2 92개 조각의 상대 경로가 깨져 정적 파일을 그대로 링크한다. */}
+        {/* 라틴 + 자주 쓰는 한글 조각은 미리 받아 글꼴 교체로 줄이 밀리는 것을 줄인다. */}
+        <link rel="preload" as="font" type="font/woff2" crossOrigin="" href="/fonts/pretendard/1.3.9/woff2-dynamic-subset/PretendardVariable.subset.91.woff2" />
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/fonts/pretendard/1.3.9/pretendardvariable-dynamic-subset.css" />
       </head>

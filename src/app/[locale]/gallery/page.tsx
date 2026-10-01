@@ -16,11 +16,11 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/gallery"
   const { locale } = await params;
   if (!hasLocale(locale)) return {};
   const dict = getDictionary(locale);
-  const cover = decks[0]?.manifest.previews[0];
+  const og = decks[0]?.manifest.og;
   return pageMetadata(locale, "/gallery", {
     title: dict.gallery.titleLocal,
     description: dict.gallery.lead,
-    image: cover ? { url: cover.src, width: cover.width, height: cover.height, alt: dict.gallery.titleLocal } : { ...DEFAULT_OG },
+    image: og ? { url: og.src, width: og.width, height: og.height, alt: dict.gallery.titleLocal } : { ...DEFAULT_OG },
   });
 }
 
@@ -41,17 +41,17 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
           <p className="eyebrow rv">
             <FrameIcon size={18} /> {g.title}
           </p>
-          <h1 id="gallery-title" className="h1 h1-sm rv d1">
+          <h1 id="gallery-title" className="h1 h1-sm">
             <span className="g-gold">{g.titleLocal}</span>
           </h1>
-          <p className="copy rv d2 mx-auto mt-6">{g.lead}</p>
-          <p className="rv d3 mt-8 inline-flex flex-wrap items-center justify-center gap-2">
+          <p className="copy mx-auto mt-6">{g.lead}</p>
+          <p className="mt-8 inline-flex flex-wrap items-center justify-center gap-2">
             <span className="chip">{fmt(g.summary, { lots: decks.length, slides: totalSlides, open: openSlides })}</span>
           </p>
         </div>
       </section>
 
-      <section aria-label={g.titleLocal}>
+      <section>
         {decks.map((d, i) => {
           const cover = d.manifest.previews[0];
           const locked = deckLockedCount(d);
@@ -64,11 +64,11 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
           return (
             <article key={d.slug} className="border-t border-line py-[clamp(56px,8vw,104px)]" aria-labelledby={`lot-${d.slug}`}>
               <div className={`wrap grid items-center gap-[clamp(32px,5vw,64px)] ${i % 2 ? "lg:grid-cols-[minmax(0,1fr)_minmax(0,1.45fr)] lg:[&>*:first-child]:order-2" : "lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]"}`}>
-                <div className="rv">
+                <div className={i === 0 ? undefined : "rv"}>
                   <Link href={`/${locale}/gallery/${d.slug}`} className="group relative block" aria-label={`${g.enter} — ${tx(d.title, locale)}`}>
                     <div className="spot" aria-hidden="true" />
                     <div className="transition-transform duration-500 ease-out group-hover:-translate-y-1">
-                      <FramedSlide src={cover.src} width={cover.width} height={cover.height} alt={tx(d.title, locale)} sizes="(min-width: 1140px) 650px, 100vw" preload={i === 0} mat={deckMatTone(d)} />
+                      <FramedSlide src={cover.src} width={cover.width} height={cover.height} alt={tx(d.title, locale)} sizes="(min-width: 1140px) 560px, (min-width: 1024px) 48vw, calc(100vw - 64px)" preload={i === 0} mat={deckMatTone(d)} />
                     </div>
                   </Link>
                   <ul className="m-0 mt-6 grid list-none grid-cols-4 gap-2 p-0 sm:grid-cols-6" aria-label={fmt(g.allSlides, { total: d.manifest.slideCount, open: d.manifest.previews.length, locked })}>
@@ -92,7 +92,7 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
                   </ul>
                 </div>
 
-                <div className="rv d1">
+                <div className={i === 0 ? undefined : "rv d1"}>
                   <div className="placard !p-[clamp(20px,2.4vw,30px)]">
                     <p className="placard-lot m-0 text-[12.5px] font-extrabold tracking-[0.16em]">
                       {g.lot} {lotNo}
@@ -110,8 +110,8 @@ export default async function GalleryPage({ params }: PageProps<"/[locale]/galle
                         [g.medium, tx(d.medium, locale)],
                         [g.slideCount, fmt(g.slideSummary, { total: d.manifest.slideCount, open: d.manifest.previews.length, locked })],
                         [g.estimate, g.estimateValue],
-                      ].map(([k, v]) => (
-                        <div key={k} className="grid grid-cols-[minmax(76px,max-content)_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
+                      ].map(([k, v], idx) => (
+                        <div key={`${k}-${idx}`} className="grid grid-cols-[minmax(76px,max-content)_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
                           <dt className="muted font-bold">{k}</dt>
                           <dd className="m-0 font-semibold">{v}</dd>
                         </div>

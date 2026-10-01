@@ -11,7 +11,8 @@
 
 산출물:
     public/gallery/<slug>/slide-NN.webp      미리보기 슬라이드(폭 --width, 기본 1920)
-    src/content/gallery/<slug>.deck.json     장수·비율·미리보기 경로·베일 data URI
+    public/gallery/<slug>/og.jpg             공유 미리보기 이미지(1200×630, 첫 공개 장)
+    src/content/gallery/<slug>.deck.json     장수·미리보기 경로·공유 이미지·베일 data URI
 
 필요 도구: python-pptx, Pillow, LibreOffice(soffice, Impress 포함), poppler(pdftoppm).
 슬라이드가 전부 전면 이미지 1장인 덱(이미지로 내보낸 PPT)은 LibreOffice 없이 원본
@@ -43,11 +44,21 @@ SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def parse_preview(value: str, count: int) -> list[int]:
-    slides = sorted({int(v) for v in value.split(",") if v.strip()})
+    try:
+        slides = sorted({int(v) for v in value.split(",") if v.strip()})
+    except ValueError:
+        sys.exit(f"--preview 는 쉼표로 구분한 슬라이드 번호입니다(예: 1,2,3). 받은 값: {value!r}")
+    if not slides:
+        sys.exit("--preview 에 공개할 슬라이드를 하나 이상 적어 주세요(예: 1,2,3).")
     bad = [s for s in slides if s < 1 or s > count]
     if bad:
         sys.exit(f"--preview 범위 밖 슬라이드: {bad} (총 {count}장)")
     return slides
+
+
+def hidden_slides(prs: Presentation) -> list[int]:
+    """PowerPoint 에서 '슬라이드 숨기기' 된 장 — LibreOffice 는 이 장을 건너뛰어 번호가 어긋난다."""
+    return [n for n, slide in enumerate(prs.slides, 1) if slide._element.get("show") == "0"]
 
 
 def full_bleed_images(prs: Presentation, preview: list[int]) -> list[bytes] | None:
@@ -67,6 +78,9 @@ def full_bleed_images(prs: Presentation, preview: list[int]) -> list[bytes] | No
         if others and (n in preview or any(s.shape_type != MSO_SHAPE_TYPE.MEDIA for s in others)):
             return None
         pic = pics[0]
+        # 자르기(crop)가 걸린 그림은 원본 바이트에 화면에 안 보이던 부분이 남아 있다 — 렌더 경로로 넘긴다.
+        if any(abs(c) > 0.001 for c in (pic.crop_left, pic.crop_right, pic.crop_top, pic.crop_bottom)):
+            return None
         if abs(pic.left) > w * 0.01 or abs(pic.top) > h * 0.01:
             return None
         if abs(pic.width - w) > w * 0.01 or abs(pic.height - h) > h * 0.01:
@@ -75,16 +89,34 @@ def full_bleed_images(prs: Presentation, preview: list[int]) -> list[bytes] | No
     return out
 
 
+def _walk_shapes(shapes):
+    for shape in shapes:
+        if shape.shape_type == MSO_SHAPE_TYPE.GROUP:
+            yield from _walk_shapes(shape.shapes)
+        else:
+            yield shape
+
+
+def _frames(shape):
+    if getattr(shape, "has_text_frame", False) and shape.has_text_frame:
+        yield shape.text_frame
+    if getattr(shape, "has_table", False) and shape.has_table:
+        for row in shape.table.rows:
+            for cell in row.cells:
+                yield cell.text_frame
+
+
 def deck_fonts(prs: Presentation) -> set[str]:
+    """덱이 직접 지정한 글꼴(그룹 도형 · 표 포함). 테마 글꼴(+mj/+mn)은 건너뛴다."""
     fonts: set[str] = set()
     for slide in prs.slides:
-        for shape in slide.shapes:
-            if not shape.has_text_frame:
-                continue
-            for para in shape.text_frame.paragraphs:
-                for run in para.runs:
-                    if run.font.name:
-                        fonts.add(run.font.name)
+        for shape in _walk_shapes(slide.shapes):
+            for frame in _frames(shape):
+                for para in frame.paragraphs:
+                    for run in para.runs:
+                        name = run.font.name
+                        if name and not name.startswith("+"):
+                            fonts.add(name)
     return fonts
 
 
@@ -140,6 +172,20 @@ def render_with_libreoffice(pptx: Path, tmp: Path, preview: list[int], width: in
     return previews, [Image.open(p).convert("RGB") for p in pages]
 
 
+def og_image(img: Image.Image) -> Image.Image:
+    """공유 미리보기용 1200×630 — 폭을 맞춘 뒤 위아래를 가운데 기준으로 자른다."""
+    w, h = 1200, 630
+    scaled_h = round(w * img.height / img.width)
+    if scaled_h < h:  # 16:9 보다 납작한 덱 — 높이를 맞추고 좌우를 자른다
+        scaled_w = round(h * img.width / img.height)
+        tmp = img.resize((scaled_w, h), Image.Resampling.LANCZOS)
+        left = (scaled_w - w) // 2
+        return tmp.crop((left, 0, left + w, h))
+    tmp = img.resize((w, scaled_h), Image.Resampling.LANCZOS)
+    top = (scaled_h - h) // 2
+    return tmp.crop((0, top, w, top + h))
+
+
 def veil_data_url(img: Image.Image) -> str:
     h = max(1, round(VEIL_WIDTH * img.height / img.width))
     tiny = img.resize((VEIL_WIDTH, h), Image.Resampling.BOX)
@@ -161,6 +207,9 @@ def main() -> None:
     prs = Presentation(str(args.pptx))
     count = len(prs.slides)
     preview = parse_preview(args.preview, count)
+    hidden = hidden_slides(prs)
+    if hidden:
+        sys.exit(f"숨김 처리된 슬라이드가 있습니다({hidden}번). PowerPoint 에서 숨김을 풀거나 삭제한 뒤 다시 실행하세요.")
 
     with tempfile.TemporaryDirectory() as t:
         tmp = Path(t)
@@ -191,15 +240,16 @@ def main() -> None:
             img.save(ROOT / "public" / rel.lstrip("/"), "WEBP", quality=86, method=6)
             entries.append({"slide": n, "src": rel, "width": img.width, "height": img.height})
 
+        og_rel = f"/gallery/{args.slug}/og.jpg"
+        og_image(previews[preview[0]]).save(ROOT / "public" / og_rel.lstrip("/"), "JPEG", quality=82, optimize=True, progressive=True)
+
         veils = [{"slide": i + 1, "dataUrl": veil_data_url(img)} for i, img in enumerate(smalls) if (i + 1) not in preview]
 
-    ratio = [prs.slide_width, prs.slide_height]
     manifest = {
         "slug": args.slug,
         "slideCount": count,
-        "aspectRatio": ratio,
-        "source": source,
         "previews": entries,
+        "og": {"src": og_rel, "width": 1200, "height": 630},
         "veils": veils,
     }
     manifest_path = ROOT / "src" / "content" / "gallery" / f"{args.slug}.deck.json"

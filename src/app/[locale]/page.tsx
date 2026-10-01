@@ -4,14 +4,14 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { CopyEmail } from "@/components/copy-email";
 import { ChevronRightIcon, GithubIcon, MailIcon } from "@/components/icons";
-import { StatusBadge } from "@/components/ui";
+import { StatusBadge, deckLockedCount } from "@/components/ui";
 import { decks } from "@/content/gallery";
 import { awards, education, experience, profile, skills, type ResumeItem } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { tx, txList } from "@/content/types";
 import { hasLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
-import { mailto } from "@/lib/site";
+import { fmt, mailto } from "@/lib/site";
 
 /**
  * 메인 — 링커리어 · 이력서형 포트폴리오처럼 단정하게. 장식(큰 그라데이션 글자 · 광원 · 등장 효과) 없이
@@ -72,7 +72,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </a>
             <CopyEmail email={profile.email} label={dict.contact.copy} done={dict.contact.copied} className="btn-line" />
           </div>
-          <a href={profile.github} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-muted-2 hover:text-ink">
+          <a href={profile.github} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex min-h-10 items-center gap-1.5 text-[13.5px] font-semibold text-muted-2 hover:text-ink">
             <GithubIcon size={16} /> github.com/kanghea
           </a>
 
@@ -169,7 +169,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               const cover = d.manifest.previews[0];
               return (
                 <li key={d.slug}>
-                  <Link href={`/${locale}/gallery/${d.slug}`} className="r-row group !grid-cols-[96px_minmax(0,1fr)_auto] items-center sm:!grid-cols-[128px_minmax(0,1fr)_auto]">
+                  <Link href={`/${locale}/gallery/${d.slug}`} className="r-row group !grid-cols-[88px_minmax(0,1fr)] items-center gap-x-4 sm:!grid-cols-[128px_minmax(0,1fr)_auto]">
                     <span className="block overflow-hidden rounded-lg border border-line-2 bg-card-2">
                       <Image src={cover.src} width={cover.width} height={cover.height} alt="" sizes="128px" className="aspect-video w-full object-cover" />
                     </span>
@@ -180,11 +180,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
                       </p>
                       <p className="m-0 mt-1 text-[14px] leading-relaxed text-muted-2">{tx(d.usedFor, locale)}</p>
                       <p className="m-0 mt-1 text-[13px] font-semibold text-muted">
-                        {d.manifest.slideCount}
-                        {locale === "ko" ? "장" : " slides"} · {dict.gallery.preview} {d.manifest.previews.length}
+                        {fmt(dict.gallery.slideSummary, { total: d.manifest.slideCount, open: d.manifest.previews.length, locked: deckLockedCount(d) })}
                       </p>
                     </div>
-                    <span className="r-period">{d.year}</span>
+                    <span className="r-period !hidden sm:!inline-flex">{d.year}</span>
                   </Link>
                 </li>
               );
@@ -208,10 +207,15 @@ function ResumeSection({ id, title, count, action, children }: { id: string; tit
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 id={`${id}-title`} className="m-0 text-[18px] font-extrabold tracking-[-0.03em]">
           {title}
-          {count !== undefined && <span className="num ml-1.5 text-[15px] font-bold text-muted-2">{count}</span>}
+          {count !== undefined && (
+            <>
+              {" "}
+              <span className="num text-[15px] font-bold text-muted-2">{count}</span>
+            </>
+          )}
         </h2>
         {action && (
-          <Link href={action.href} className="inline-flex items-center gap-0.5 text-[13.5px] font-semibold text-muted-2 hover:text-ink">
+          <Link href={action.href} className="-my-2 inline-flex min-h-10 items-center gap-0.5 text-[13.5px] font-semibold text-muted-2 hover:text-ink">
             {action.label}
             <ChevronRightIcon size={15} />
           </Link>

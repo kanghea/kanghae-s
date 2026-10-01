@@ -64,15 +64,14 @@ export type Project = {
   screens?: { src: string; width: number; height: number; alt: L10n }[];
   /** 연결된 발표자료(갤러리 slug) */
   deck?: string;
-  featured?: boolean;
 };
 
 export type DeckManifest = {
   slug: string;
   slideCount: number;
-  aspectRatio: [number, number];
-  source: string;
   previews: { slide: number; src: string; width: number; height: number }[];
+  /** 공유 미리보기 이미지(1200×630 JPEG) */
+  og: { src: string; width: number; height: number };
   veils: { slide: number; dataUrl: string }[];
 };
 

@@ -131,7 +131,7 @@
   --glow: radial-gradient(closest-side, rgba(245, 184, 65, 0.2), rgba(92, 120, 255, 0.1) 45%, transparent 72%);
   --selection: rgba(245, 184, 65, 0.35);
   color-scheme: dark;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--ink);
 }
 
@@ -496,6 +496,18 @@
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
   }
+  /* 아주 좁은 폰: 기간을 제목 위 작은 줄로 올려 본문 폭을 넓힌다 */
+  @media (max-width: 479px) {
+    .r-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2px;
+    }
+    .r-row > .r-period {
+      order: -1;
+      padding-top: 0;
+      font-size: 12.5px;
+    }
+  }
   .btn-solid,
   .btn-line {
     display: inline-flex;
@@ -701,17 +713,17 @@
     z-index: 0;
   }
 
-  /* ───────────────────────── 등장 애니메이션 ───────────────────────── */
+  /* ───────────────────────── 등장 애니메이션 ─────────────────────────
+   * 숨김은 RevealObserver 가 돌기 시작한 뒤(html.rv-ready)에만 건다 — 그 전에 화면에 보이던 요소는 먼저 .on 을
+   * 받아 깜빡이지 않고, JS 가 늦거나 실패하면 처음부터 끝까지 그대로 보인다(첫 그리기 · LCP 를 막지 않는다). */
   .rv {
-    opacity: 0;
-    transform: translate3d(0, 32px, 0);
     transition:
       opacity 0.9s var(--ease),
       transform 1.1s var(--ease);
   }
-  .rv.on {
-    opacity: 1;
-    transform: none;
+  html.rv-ready .rv:not(.on) {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
   }
   .rv.d1 {
     transition-delay: 0.08s;
@@ -725,13 +737,9 @@
   .rv.d4 {
     transition-delay: 0.32s;
   }
-  html:not(.js) .rv {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
   @media (prefers-reduced-motion: reduce) {
-    .rv {
+    .rv,
+    html.rv-ready .rv:not(.on) {
       opacity: 1;
       transform: none;
       transition: none;

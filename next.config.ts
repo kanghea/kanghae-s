@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // 버전 경로라 내용이 바뀌지 않는다 — 재방문 때 글꼴 조각을 다시 확인하지 않게.
+        source: "/fonts/pretendard/1.3.9/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
         source: "/gallery/:path*",
         headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
       },

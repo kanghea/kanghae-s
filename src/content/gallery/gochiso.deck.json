@@ -1,11 +1,6 @@
 {
  "slug": "gochiso",
  "slideCount": 45,
- "aspectRatio": [
-  12192000,
-  6858000
- ],
- "source": "embedded-images",
  "previews": [
   {
    "slide": 1,
@@ -26,6 +21,11 @@
    "height": 1080
   }
  ],
+ "og": {
+  "src": "/gallery/gochiso/og.jpg",
+  "width": 1200,
+  "height": 630
+ },
  "veils": [
   {
    "slide": 4,

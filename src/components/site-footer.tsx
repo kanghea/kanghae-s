@@ -37,17 +37,17 @@ export function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary 
           <p className="m-0 font-semibold">
             © {new Date().getFullYear()} {dict.footer.rights}
           </p>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-semibold">
-            <Link href={`/${locale}/profile`} className="hover:text-ink">
+          <div className="flex flex-wrap items-center gap-x-5 font-semibold">
+            <Link href={`/${locale}/profile`} className="inline-flex min-h-10 items-center hover:text-ink">
               {dict.nav.profile}
             </Link>
-            <Link href={`/${locale}/projects`} className="hover:text-ink">
+            <Link href={`/${locale}/projects`} className="inline-flex min-h-10 items-center hover:text-ink">
               {dict.nav.projects}
             </Link>
-            <Link href={`/${locale}/gallery`} className="hover:text-ink">
+            <Link href={`/${locale}/gallery`} className="inline-flex min-h-10 items-center hover:text-ink">
               {dict.nav.gallery}
             </Link>
-            <a href={profile.github} className="inline-flex items-center gap-1.5 hover:text-ink" rel="noopener noreferrer" target="_blank">
+            <a href={profile.github} className="inline-flex min-h-10 items-center gap-1.5 hover:text-ink" rel="noopener noreferrer" target="_blank">
               <GithubIcon size={16} /> GitHub
             </a>
           </div>

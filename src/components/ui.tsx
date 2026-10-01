@@ -41,15 +41,6 @@ export function SectionHead({
   );
 }
 
-export function MoreLink({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <Link href={href} className="link">
-      {children}
-      <ArrowRightIcon size={17} />
-    </Link>
-  );
-}
-
 /** 프로젝트 표지 — 이미지가 있으면 이미지, 없으면 그린 표지. 16:9 상자를 채운다. */
 export function ProjectCover({ project, locale, sizes, preload }: { project: Project; locale: Locale; sizes: string; preload?: boolean }) {
   if (project.cover) {
@@ -69,13 +60,13 @@ export function ProjectCover({ project, locale, sizes, preload }: { project: Pro
   return <div className="h-full w-full bg-card-2" aria-hidden="true" />;
 }
 
-export function ProjectCard({ project, locale, dict, large, headingLevel = 3 }: { project: Project; locale: Locale; dict: Dictionary; large?: boolean; headingLevel?: 2 | 3 }) {
+export function ProjectCard({ project, locale, dict, headingLevel = 3 }: { project: Project; locale: Locale; dict: Dictionary; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   return (
     <Link href={`/${locale}/projects/${project.slug}`} className="tile tile-link group flex h-full flex-col !p-0">
       <div className="relative aspect-[16/9] overflow-hidden border-b border-line-2 bg-card-2">
         <div className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]">
-          <ProjectCover project={project} locale={locale} sizes={large ? "(min-width: 900px) 640px, 100vw" : "(min-width: 900px) 360px, (min-width: 640px) 50vw, 100vw"} />
+          <ProjectCover project={project} locale={locale} sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw" />
         </div>
       </div>
       <div className="flex flex-1 flex-col p-6 md:p-7">
@@ -83,7 +74,7 @@ export function ProjectCard({ project, locale, dict, large, headingLevel = 3 }: 
           <StatusBadge status={project.status} dict={dict} />
           {project.period && <span className="caption num">{tx(project.period, locale)}</span>}
         </div>
-        <Heading className={large ? "h3" : "h4 !text-[clamp(21px,2vw,26px)]"}>{tx(project.name, locale)}</Heading>
+        <Heading className="h4 !text-[clamp(21px,2vw,26px)]">{tx(project.name, locale)}</Heading>
         <p className="mt-2 text-[15.5px] font-semibold leading-relaxed text-muted-2">{tx(project.tagline, locale)}</p>
         <p className="mt-auto pt-5 text-[13.5px] font-semibold text-ink-2">
           <span className="text-muted-2">{dict.projects.role} · </span>
@@ -151,7 +142,7 @@ export function VeiledSlide({ dataUrl, slide, label }: { dataUrl: string; slide:
       <div className="lock-glass" aria-hidden="true">
         <LockIcon size={18} />
       </div>
-      <span className="num absolute left-2 top-1.5 text-[11px] font-bold text-white/80" aria-hidden="true">
+      <span className="num absolute left-1.5 top-1 rounded bg-black/65 px-1 text-[10.5px] font-bold text-white" aria-hidden="true">
         {String(slide).padStart(2, "0")}
       </span>
     </div>

@@ -10,6 +10,7 @@ import { tx, txList } from "@/content/types";
 import { hasLocale, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { pageMetadata } from "@/lib/metadata";
+import { fmt } from "@/lib/site";
 
 export const dynamicParams = false;
 
@@ -55,7 +56,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
           </Link>
           <div className="mt-[clamp(28px,5vw,56px)] grid gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-end">
             <div>
-              <div className="rv mb-5 flex flex-wrap items-center gap-2">
+              <div className="mb-5 flex flex-wrap items-center gap-2">
                 <StatusBadge status={project.status} dict={dict} />
                 {txList(project.categories, locale).map((c) => (
                   <span key={c} className="chip !min-h-0 !py-1">
@@ -63,12 +64,12 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
                   </span>
                 ))}
               </div>
-              <h1 className="h1 h1-sm rv d1">{tx(project.name, locale)}</h1>
-              <p className="copy rv d2 mt-5 !text-[clamp(19px,2vw,24px)]">
+              <h1 className="h1 h1-sm">{tx(project.name, locale)}</h1>
+              <p className="copy mt-5 !text-[clamp(19px,2vw,24px)]">
                 <b>{tx(project.tagline, locale)}</b>
               </p>
               {project.links && (
-                <div className="rv d3 mt-8 flex flex-wrap gap-3">
+                <div className="mt-8 flex flex-wrap gap-3">
                   {project.links.map((l, i) => (
                     <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" className={i === 0 ? "btn" : "btn-ghost"}>
                       {tx(l.label, locale)}
@@ -78,7 +79,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
                 </div>
               )}
             </div>
-            <dl className="rv d2 m-0 grid gap-0 rounded-[22px] border border-line bg-card p-1">
+            <dl className="m-0 grid gap-0 rounded-[22px] border border-line bg-card p-1">
               {meta.map((m) => (
                 <div key={m.label} className="grid grid-cols-[84px_minmax(0,1fr)] gap-3 border-b border-line-2 px-5 py-4 last:border-b-0">
                   <dt className="caption">{m.label}</dt>
@@ -103,7 +104,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
       </header>
 
       <div className="wrap mt-[clamp(32px,5vw,56px)]">
-        <div className="tile rv relative aspect-[16/9] overflow-hidden !p-0">
+        <div className="tile relative aspect-[16/9] overflow-hidden !p-0">
           <ProjectCover project={project} locale={locale} sizes="(min-width: 1140px) 1120px, 100vw" preload />
         </div>
         {project.metrics && (
@@ -150,12 +151,12 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
           </div>
           <div className="wrap">
             {/* 모바일은 가로로 넘기고, 넓은 화면은 한 줄 격자로 전부 보인다(숨은 스크롤 없음). */}
-            <ul className="hscroll m-0 list-none p-0 pb-2 lg:grid lg:grid-cols-6 lg:gap-4 lg:overflow-visible">
+            <ul tabIndex={0} aria-label={dict.projects.screens} className="hscroll m-0 list-none p-0 pb-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:overflow-visible lg:grid-cols-6">
               {project.screens.map((s) => (
-                <li key={s.src} className="w-[min(46vw,220px)] lg:w-auto">
+                <li key={s.src} className="w-[min(46vw,220px)] sm:w-auto">
                   <figure className="m-0">
                     <div className="overflow-hidden rounded-[22px] border border-line bg-card-2">
-                      <Image src={s.src} width={s.width} height={s.height} alt="" sizes="(min-width: 1024px) 180px, 46vw" className="w-full" />
+                      <Image src={s.src} width={s.width} height={s.height} alt="" sizes="(min-width: 1024px) 180px, (min-width: 640px) 30vw, 46vw" className="w-full" />
                     </div>
                     <figcaption className="caption mt-3 text-center">{tx(s.alt, locale)}</figcaption>
                   </figure>
@@ -177,7 +178,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
                   width={deck.manifest.previews[0].width}
                   height={deck.manifest.previews[0].height}
                   alt={tx(deck.title, locale)}
-                  sizes="(min-width: 900px) 600px, 100vw"
+                  sizes="(min-width: 768px) 50vw, 100vw"
                   mat={deckMatTone(deck)}
                 />
               </div>
@@ -190,10 +191,7 @@ export default async function ProjectPage({ params }: PageProps<"/[locale]/proje
                 {tx(deck.title, locale)}
               </h2>
               <p className="copy mt-4 !text-[17px]">{tx(deck.usedFor, locale)}</p>
-              <p className="caption mt-3">
-                {deck.manifest.slideCount}
-                {locale === "ko" ? "장" : " slides"} · {dict.gallery.preview} {deck.manifest.previews.length} · {dict.gallery.locked} {deckLockedCount(deck)}
-              </p>
+              <p className="caption mt-3">{fmt(dict.gallery.slideSummary, { total: deck.manifest.slideCount, open: deck.manifest.previews.length, locked: deckLockedCount(deck) })}</p>
               <Link href={`/${locale}/gallery/${deck.slug}`} className="btn mt-8">
                 {dict.projects.viewDeck}
                 <ArrowRightIcon size={18} />

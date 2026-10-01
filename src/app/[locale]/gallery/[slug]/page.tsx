@@ -24,11 +24,11 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/gallery/
   const deck = getDeck(slug);
   if (!hasLocale(locale) || !deck) return {};
   const dict = getDictionary(locale);
-  const cover = deck.manifest.previews[0];
+  const og = deck.manifest.og;
   return pageMetadata(locale, `/gallery/${slug}`, {
     title: `${dict.gallery.lot} ${String(deck.lot).padStart(2, "0")} · ${tx(deck.title, locale)}`,
     description: tx(deck.subtitle, locale),
-    image: { url: cover.src, width: cover.width, height: cover.height, alt: tx(deck.title, locale) },
+    image: { url: og.src, width: og.width, height: og.height, alt: tx(deck.title, locale) },
   });
 }
 
@@ -76,8 +76,8 @@ export default async function LotPage({ params }: PageProps<"/[locale]/gallery/[
             {g.lot} {lotNo} · {deck.year}
             {deck.result && <span className="badge badge-gold ml-1">{tx(deck.result, locale)}</span>}
           </p>
-          <h1 className="h1 h1-sm rv d1">{tx(deck.title, locale)}</h1>
-          <p className="copy rv d2 mt-5">
+          <h1 className="h1 h1-sm">{tx(deck.title, locale)}</h1>
+          <p className="copy mt-5">
             <b>{tx(deck.subtitle, locale)}</b>
           </p>
         </header>
@@ -142,8 +142,8 @@ export default async function LotPage({ params }: PageProps<"/[locale]/gallery/[
               {tx(deck.title, locale)}
             </h2>
             <dl className="m-0 mt-4 grid border-t border-black/10 text-[14px]">
-              {facts.map(([k, v]) => (
-                <div key={k} className="grid grid-cols-[minmax(76px,max-content)_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
+              {facts.map(([k, v], idx) => (
+                <div key={`${k}-${idx}`} className="grid grid-cols-[minmax(76px,max-content)_minmax(0,1fr)] gap-3 border-b border-black/10 py-2.5">
                   <dt className="muted font-bold">{k}</dt>
                   <dd className="m-0 font-semibold leading-relaxed">{v}</dd>
                 </div>

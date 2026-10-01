@@ -59,16 +59,16 @@ export default async function ProfilePage({ params }: PageProps<"/[locale]/profi
         <div className="glow" style={{ top: "10%" }} aria-hidden="true" />
         <div className="wrap relative z-[1] pt-[clamp(56px,9vw,120px)] pb-[clamp(40px,6vw,72px)]">
           <p className="eyebrow rv">{dict.profile.eyebrow}</p>
-          <h1 id="profile-title" className="h1 h1-sm rv d1">
+          <h1 id="profile-title" className="h1 h1-sm">
             {tx(profile.name, locale)}{" "}
             <span className="text-muted-2" lang={locale === "ko" ? "en" : "ko"}>
               {tx(profile.altName, locale)}
             </span>
           </h1>
-          <p className="copy rv d2 mt-6 !text-[clamp(19px,2vw,24px)]">
+          <p className="copy mt-6 !text-[clamp(19px,2vw,24px)]">
             <b>{tx(profile.headline, locale)}</b> {dict.profile.lead}
           </p>
-          <div className="rv d3 mt-9 flex flex-wrap gap-3">
+          <div className="mt-9 flex flex-wrap gap-3">
             <a href={mailto(profile.email, dict.contact.mailSubject)} className="btn">
               <MailIcon size={19} />
               {profile.email}
