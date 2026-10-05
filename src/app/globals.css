@@ -486,6 +486,28 @@
   a.r-row:hover {
     background: linear-gradient(90deg, transparent, var(--card-2) 12%, var(--card-2) 88%, transparent);
   }
+  /* 행 안에 따로 눌리는 링크(서비스 바로가기)가 있는 행 — 제목 링크를 행 전체로 늘린다 */
+  .r-row-link {
+    position: relative;
+    transition: background 0.15s;
+  }
+  .r-row-link:hover {
+    background: linear-gradient(90deg, transparent, var(--card-2) 12%, var(--card-2) 88%, transparent);
+  }
+  /* 카드 · 행 전체를 덮는 제목 링크. 포커스 링은 덮은 영역에 그린다. */
+  .stretched::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .stretched:focus-visible {
+    outline: none;
+  }
+  .stretched:focus-visible::after {
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+  }
   .r-period {
     display: inline-flex;
     align-items: center;

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { CopyEmail } from "@/components/copy-email";
 import { ChevronRightIcon, GithubIcon, MailIcon } from "@/components/icons";
-import { StatusBadge, deckLockedCount } from "@/components/ui";
+import { LiveLink, ProjectCover, StatusBadge, deckLockedCount } from "@/components/ui";
 import { decks } from "@/content/gallery";
 import { awards, education, experience, profile, skills, type ResumeItem } from "@/content/profile";
 import { projects } from "@/content/projects";
@@ -143,20 +143,30 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           <ul className="m-0 list-none p-0">
             {projects.map((p) => (
               <li key={p.slug}>
-                <Link href={`/${locale}/projects/${p.slug}`} className="r-row group">
+                {/* 행 전체가 상세 링크(제목 링크를 늘림), 서비스 바로가기만 따로 눌린다 — 발표자료 행과 같은 썸네일 격자 */}
+                <div className="r-row r-row-link group !grid-cols-[88px_minmax(0,1fr)] gap-x-4 sm:!grid-cols-[128px_minmax(0,1fr)_auto]">
+                  <span className="relative mt-0.5 block aspect-video overflow-hidden rounded-lg border border-line-2 bg-card-2">
+                    <ProjectCover project={p} locale={locale} sizes="128px" decorative />
+                  </span>
                   <div className="min-w-0">
                     <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 text-[15.5px] font-bold tracking-[-0.02em]">
-                      <span className="group-hover:underline group-hover:underline-offset-4">{tx(p.name, locale)}</span>
+                      <Link href={`/${locale}/projects/${p.slug}`} className="stretched group-hover:underline group-hover:underline-offset-4">
+                        {tx(p.name, locale)}
+                      </Link>
                       <StatusBadge status={p.status} dict={dict} />
                     </p>
                     <p className="m-0 mt-1 text-[14px] leading-relaxed text-muted-2">{tx(p.tagline, locale)}</p>
-                    <p className="m-0 mt-1 text-[13px] font-semibold text-muted">{tx(p.role, locale)}</p>
+                    <p className="m-0 mt-1 text-[13px] font-semibold text-muted">
+                      {p.period && <span className="num sm:hidden">{tx(p.period, locale)} · </span>}
+                      {tx(p.role, locale)}
+                    </p>
+                    <LiveLink project={p} locale={locale} className="mt-2.5" />
                   </div>
-                  <span className="r-period">
+                  <span className="r-period !hidden sm:!inline-flex">
                     {p.period ? tx(p.period, locale) : ""}
-                    <ChevronRightIcon size={15} className="ml-1 hidden text-muted-2 sm:inline" />
+                    <ChevronRightIcon size={15} className="ml-1 text-muted-2" />
                   </span>
-                </Link>
+                </div>
               </li>
             ))}
           </ul>
