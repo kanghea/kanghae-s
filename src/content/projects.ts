@@ -3,7 +3,7 @@ import type { Project } from "./types";
 /**
  * 프로젝트 목록 — 배열 순서가 곧 노출 순서다.
  * 원칙: 저장소 · 발표자료 · 본인이 정리한 기록으로 확인된 사실만 적는다. 모르는 칸은 비운다.
- * 비공개 저장소(중개사코치 · 오목조목 · 서문12)는 코드 링크를 걸지 않는다.
+ * 비공개 저장소(중개사코치 · 오목조목 · 서문12)는 코드 링크를 걸지 않는다 — 배포된 서비스 주소만 건다.
  */
 export const projects: Project[] = [
   {
@@ -299,19 +299,19 @@ export const projects: Project[] = [
       en: "One QR scan opens a Seomun Market store's menu in four languages, a payment guide, and in-market walking directions",
     },
     summary: {
-      ko: "서문시장 상인회와 협업한 학생 프로젝트입니다. 가게마다 붙인 QR로 한 · 영 · 중 · 일 메뉴판과 결제 방법, 가게 이야기, 시장 골목 길찾기를 보여 주는 모바일 웹을 처음부터 끝까지 개발했습니다.",
-      en: "A student project in collaboration with the Seomun Market merchants' association. I built, end to end, a mobile web service where each stall's QR code opens its menu in Korean, English, Chinese, and Japanese, how to pay, the store's story, and directions through the market's alleys.",
+      ko: "서문시장 상인회와 협업한 학생 프로젝트입니다. 가게마다 붙인 QR로 한 · 영 · 중 · 일 메뉴판과 결제 방법, 가게 이야기, 시장 골목 길찾기를 보여 주는 모바일 웹을 처음부터 끝까지 개발했고, 지금은 데이터베이스 없는 정적 사이트로 다시 만들어 Vercel에서 운영합니다.",
+      en: "A student project in collaboration with the Seomun Market merchants' association. I built, end to end, a mobile web service where each stall's QR code opens its menu in Korean, English, Chinese, and Japanese, how to pay, the store's story, and directions through the market's alleys — and later rebuilt it as a database-free static site that now runs on Vercel.",
     },
-    period: { ko: "2025.03 – 2025.06", en: "Mar – Jun 2025" },
+    period: { ko: "2025.03 – 06 · 2026.10", en: "Mar – Jun 2025 · Oct 2026" },
     year: 2025,
-    status: "shipped",
+    status: "live",
     categories: { ko: ["로컬 · 전통시장", "지도 · 길찾기", "웹"], en: ["Local market", "Maps & routing", "Web"] },
     role: { ko: "기획 · 풀스택 개발 · 배포", en: "Planning, full-stack development, deployment" },
     team: { ko: "학생팀 × 서문시장 상인회", en: "Student team × Seomun Market merchants' association" },
-    stack: ["Next.js 15", "React 19", "TypeScript", "Tailwind CSS 4", "MongoDB", "NextAuth", "Kakao Login", "NAVER Maps", "Docker", "Nginx"],
+    stack: ["Next.js 15", "React 19", "TypeScript", "Tailwind CSS 4", "NAVER Maps", "Vercel", "MongoDB", "NextAuth", "Kakao Login", "Docker", "Nginx"],
     metrics: [
       { value: { ko: "4개 국어", en: "4" }, label: { ko: "한 · 영 · 중 · 일", en: "Languages (KO · EN · ZH · JA)" } },
-      { value: { ko: "85개", en: "85" }, label: { ko: "API 라우트", en: "API routes" } },
+      { value: { ko: "85개", en: "85" }, label: { ko: "API 라우트 (2025년 버전)", en: "API routes (2025 version)" } },
       { value: "416", label: { ko: "커밋 (2025.03–06)", en: "Commits (Mar–Jun 2025)" } },
     ],
     story: [
@@ -353,90 +353,100 @@ export const projects: Project[] = [
         },
       },
       {
+        key: "product",
+        body: {
+          ko: "2026년 10월, 서버 없이 유지할 수 있게 다시 만들었습니다. 데이터베이스와 로그인을 걷어내고 가게 8곳 · 메뉴 · 매거진 글을 정적 JSON으로 옮겨 모든 페이지를 빌드 때 생성하고, 서버 함수는 네이버 길찾기 프록시 하나만 남겼습니다. 예전 주소(숫자 id · 언어별 슬러그)는 영구 리디렉트로 이어 검색 유입을 지켰습니다.",
+          en: "In October 2026 I rebuilt it to run without a server: I removed the database and logins, moved the eight stores, their menus, and the magazine posts into static JSON so every page is generated at build time, and kept a single serverless function — the NAVER Directions proxy. Old URLs (numeric ids, per-language slugs) permanently redirect to the new ones so search traffic carries over.",
+        },
+      },
+      {
         key: "result",
         body: {
-          ko: "석 달 동안 416개 커밋, 85개 API 라우트 규모의 서비스로 만들어 seomun12.com 도메인으로 배포했습니다.",
-          en: "Over three months and 416 commits, it grew into a service with 85 API routes, deployed on the seomun12.com domain.",
+          ko: "석 달 동안 416개 커밋, 85개 API 라우트 규모의 서비스로 만들어 seomun12.com 도메인으로 배포했고, 지금은 정적 사이트로 Vercel에서 운영하고 있습니다.",
+          en: "Over three months and 416 commits, it grew into a service with 85 API routes, deployed on the seomun12.com domain; today it runs on Vercel as a static site.",
         },
       },
     ],
+    links: [{ label: { ko: "서비스 보기", en: "Visit the site" }, href: "https://sumun12.vercel.app" }],
     art: "market",
   },
   {
     slug: "omokjomok",
     name: { ko: "오목조목", en: "OmokJomok" },
     tagline: {
-      ko: "초대 링크 하나로 친구와 바로 두는 실시간 온라인 오목",
-      en: "Real-time online Omok (Gomoku) — play a friend instantly with one invite link",
+      ko: "초대 링크 하나로 가입 없이 친구와 바로 두는 실시간 온라인 오목",
+      en: "Real-time online Omok (Gomoku) — play a friend instantly with one invite link, no sign-up",
     },
     summary: {
-      ko: "Socket.IO 실시간 대전, Elo 레이팅 빠른 매칭, 로그인 없이 들어오는 친구 초대, 10단계 알파베타 AI까지 — 모바일과 데스크톱에서 두는 오목 서비스를 혼자 만들었습니다.",
-      en: "Real-time Socket.IO matches, Elo-rated quick match, friend invites that work without an account, and a 10-tier alpha-beta AI — a solo-built Omok service for mobile and desktop.",
+      ko: "링크를 보내면 친구가 여는 순간 대국이 시작됩니다. 렌주룰 · 스왑2 오프닝 · 초읽기까지 모든 수를 서버가 검증하고, 새로고침해도 자리가 그대로 돌아옵니다. 2025년 Socket.IO 버전을 혼자 만든 뒤, 2026년 Vercel + Supabase 구조로 다시 만들어 운영하고 있습니다.",
+      en: "Send a link and the game starts the moment your friend opens it. The server validates every move — Renju rules, Swap2 openings, byo-yomi clocks — and your seat comes back even after a refresh. I built the 2025 Socket.IO version solo, then rebuilt it on Vercel + Supabase in 2026, where it runs today.",
     },
-    period: { ko: "2025.01 – 2025.03", en: "Jan – Mar 2025" },
+    period: { ko: "2025.01 – 03 · 2026.10", en: "Jan – Mar 2025 · Oct 2026" },
     year: 2025,
-    status: "shipped",
+    status: "live",
     categories: { ko: ["게임", "실시간 웹"], en: ["Game", "Real-time web"] },
-    role: { ko: "1인 개발 — 서버 · AI 엔진 · 웹 클라이언트", en: "Solo developer — server, AI engine, web client" },
-    stack: ["React 18", "Node.js", "Express", "Socket.IO", "MongoDB", "JWT", "Google OAuth", "Tailwind CSS"],
+    role: { ko: "1인 개발 — 규칙 엔진 · 서버 · AI · 웹 클라이언트", en: "Solo developer — rules engine, server, AI, web client" },
+    stack: ["Next.js 16", "React 19", "TypeScript", "Supabase (Postgres · Realtime)", "Web Worker", "Vitest", "Playwright", "Vercel", "Socket.IO", "MongoDB"],
     metrics: [
-      { value: "193", label: { ko: "커밋 (6주)", en: "Commits in 6 weeks" } },
-      { value: { ko: "10단계", en: "10" }, label: { ko: "AI 난이도", en: "AI difficulty tiers" } },
-      { value: "15×15", label: { ko: "판 · 삼삼 금수 판정", en: "Board with the double-three rule" } },
+      { value: { ko: "4가지", en: "4" }, label: { ko: "규칙 (렌주 · 일반 · 정오목 · 자유)", en: "Rule sets (Renju, Korean, standard, freestyle)" } },
+      { value: { ko: "3가지", en: "3" }, label: { ko: "오프닝 (자유 · 스왑 · 스왑2)", en: "Openings (free, swap, Swap2)" } },
+      { value: "0", label: { ko: "가입 · 광고 · 상점", en: "Sign-ups, ads, or shop" } },
+      { value: "193", label: { ko: "커밋 (2025년 버전, 6주)", en: "Commits (2025 version, 6 weeks)" } },
     ],
     story: [
       {
         key: "problem",
         body: {
-          ko: "휴대폰이든 PC든 오목을 바로 두고 싶을 때 — 친구와, 비슷한 실력의 낯선 상대와, 혹은 혼자 연습으로 — 가입과 설치가 장벽이 되지 않아야 했습니다.",
-          en: "Whether on a phone or a PC, playing Omok right away — with a friend, a stranger of similar skill, or solo practice — shouldn't be blocked by sign-ups and installs.",
+          ko: "휴대폰이든 PC든 오목을 바로 두고 싶을 때 — 친구와, 혹은 혼자 연습으로 — 가입과 설치가 장벽이 되지 않아야 했습니다. 그리고 친구끼리 두는 규모의 서비스라면 상시 서버 비용 없이 오래 유지할 수 있어야 했습니다.",
+          en: "Whether on a phone or a PC, playing Omok right away — with a friend or as solo practice — shouldn't be blocked by sign-ups and installs. And a service at friends-playing-friends scale had to be cheap enough to keep running without an always-on server.",
         },
       },
       {
         key: "solution",
         body: {
-          ko: "서버가 판을 쥐는(server-authoritative) 실시간 오목을 만들었습니다.",
-          en: "I built a server-authoritative real-time Omok game.",
+          ko: "서버가 모든 수를 검증하는(server-authoritative) 친구 대전 오목을 만들었습니다.",
+          en: "I built a server-authoritative Omok game for playing friends.",
         },
         bullets: {
           ko: [
-            "Socket.IO 방 · 비밀번호 방, 서버 시계(1 · 3 · 5 · 10분), 흑 삼삼 금수 · 5목 판정을 서버에서 검증",
-            "Elo 레이팅(초기 400, 신규 K=48) + 같은 시간 규칙 · 레이팅 차 100 이내 빠른 매칭",
-            "초대 링크로 들어온 친구는 로그인 없이 게스트로 바로 대국",
-            "알파베타 탐색 · 반복 심화 · 조브리스트 트랜스포지션 테이블 기반 10단계 AI, 캐릭터 봇 · 힌트 · 무르기",
-            "기보 저장과 복기, 랭킹, 시즌 패스 · 바둑판/돌 꾸미기",
+            "방을 만들고 초대 링크를 보내면 친구가 열자마자 대국 — 세 번째로 들어온 사람부터는 관전",
+            "렌주룰(기본) · 일반룰 · 정오목 · 자유룰, 자유 · 스왑 · 스왑2 오프닝, 단판 · 피셔 · 초읽기 시계, 15줄 · 19줄 판",
+            "금수 · 차례 · 시간 · 오프닝 단계를 순수 함수 규칙 엔진으로 판정 — 서버와 브라우저가 같은 코드를 쓰고, 금수 자리는 판에 미리 표시",
+            "로그인 대신 자리 토큰 — 새로고침 · 재접속 · '다른 기기에서 이어하기'까지 같은 자리로 복귀",
+            "브라우저 Web Worker AI(쉬움 · 보통 · 어려움, VCF 탐색)와 한 기기 2인 대국, 내 기록",
           ],
           en: [
-            "Socket.IO rooms (optionally password-protected), a server clock (1 · 3 · 5 · 10 min), and server-side checks for black's double-three rule and five-in-a-row",
-            "Elo rating (start 400, K=48 for new players) plus quick match within the same time control and a rating gap of 100",
-            "Friends who open an invite link play immediately as guests, no login needed",
-            "A 10-tier AI built on alpha-beta search, iterative deepening, and a Zobrist transposition table — with character bots, hints, and undo",
-            "Game records with replay, rankings, and a season pass with board and stone cosmetics",
+            "Create a room, send the invite link, and the game starts when your friend opens it — anyone arriving third spectates",
+            "Renju (default), Korean, standard, and freestyle rules; free, swap, and Swap2 openings; sudden-death, Fischer, and byo-yomi clocks; 15- and 19-line boards",
+            "A pure-function rules engine judges forbidden moves, turn order, time, and opening phases — the server and browser share the same code, and forbidden points are marked on the board",
+            "Seat tokens instead of logins — refresh, reconnect, or 'continue on another device' and you land back in the same seat",
+            "An in-browser Web Worker AI (easy, normal, hard, with VCF search), same-device two-player games, and a personal game history",
           ],
         },
       },
       {
         key: "role",
         body: {
-          ko: "서버 · AI 엔진 · 웹 클라이언트를 혼자 개발했습니다. 2,012줄짜리 단일 서버 파일을 config · controllers · models · services로 나누는 리팩터링을 했고, AI 엔진을 클라이언트에서 서버로 옮기며 비트보드 · C++/WASM 구현도 실험했습니다.",
-          en: "I built the server, AI engine, and web client alone. I refactored a 2,012-line single server file into config, controllers, models, and services, and moved the AI engine from the client to the server, experimenting with bitboard and C++/WASM versions along the way.",
+          ko: "규칙 명세부터 서버 · AI · 웹 클라이언트까지 혼자 맡았습니다. 2025년 버전에서는 Socket.IO 서버, Elo 레이팅 빠른 매칭, 알파베타 탐색 · 조브리스트 테이블 기반 10단계 AI, 시즌 패스까지 만들었고, 2,012줄짜리 단일 서버 파일을 config · controllers · models · services로 나누는 리팩터링을 했습니다.",
+          en: "I owned everything from the rules spec to the server, AI, and web client. The 2025 version had a Socket.IO server, Elo-rated quick match, a 10-tier AI built on alpha-beta search and a Zobrist table, and a season pass — and I refactored its 2,012-line single server file into config, controllers, models, and services.",
         },
       },
       {
         key: "product",
         body: {
-          ko: "데스크톱과 모바일 화면을 따로 설계했습니다 — 모바일은 스와이프 탭, 핀치 · 레버 확대, 이모지 채팅, 효과음과 승리 연출까지. 운영을 위해 일일 지표(신규 · DAU · 동시 접속 · 대국 수)를 매일 자정에 메일로 받는 리포트도 붙였습니다.",
-          en: "Desktop and mobile got separate designs — the mobile UI has swipe tabs, pinch and lever zoom, emoji chat, sound effects, and a win animation. For operations, a daily report emails new users, DAU, peak concurrency, and game counts every night at midnight (KST).",
+          ko: "2026년 재구축에서는 상시 실행되는 게임 서버를 없앴습니다. API 함수가 수를 검증해 Postgres에 낙관적 잠금으로 저장하고 Supabase Realtime으로 새 버전을 알리면, 상대 화면이 판을 다시 받아 옵니다. 공개 키로는 어떤 테이블도 읽을 수 없게 잠가 방 코드가 새지 않게 했고, Realtime이 끊기면 폴링으로 자동 전환합니다.",
+          en: "The 2026 rebuild removed the always-on game server. An API function validates each move, saves it to Postgres with optimistic locking, and announces the new version over Supabase Realtime; the opponent's screen then fetches the updated board. Tables are locked so the public key can't read any of them — room codes can't leak — and the app falls back to polling if Realtime drops.",
         },
       },
       {
         key: "result",
         body: {
-          ko: "2025년 1월부터 6주 동안 193개 커밋으로 AI 엔진 고도화, Elo 랭킹, 친구 초대 대전, 모바일 화면, 서버 모듈화를 더해 서비스를 완성했고, 검색 노출을 위해 Next.js 15로 옮기는 작업을 시작했습니다.",
-          en: "Over six weeks from January 2025, 193 commits added a stronger AI engine, Elo rankings, friend-invite matches, a mobile UI, and a modular server, rounding it into a full service — then I began migrating it to Next.js 15 for search visibility.",
+          ko: "2025년 1월부터 6주 동안 193개 커밋으로 첫 서비스를 완성했고, 2026년 10월 Vercel · Supabase 무료 플랜만으로 도는 구조로 다시 만들어 배포했습니다. 규칙 명세(RULES.md)를 기준으로 규칙 엔진 · 게임 진행 · AI 단위 테스트(Vitest)와 두 브라우저로 친구 대전 전체를 도는 종단 테스트(Playwright)를 갖췄습니다.",
+          en: "Six weeks and 193 commits from January 2025 produced the first full service; in October 2026 I rebuilt and redeployed it to run entirely on Vercel's and Supabase's free plans. Against a written rules spec (RULES.md), it has unit tests for the rules engine, game flow, and AI (Vitest) and an end-to-end test that plays a full friend match across two browsers (Playwright).",
         },
       },
     ],
+    links: [{ label: { ko: "웹에서 두기", en: "Play on the web" }, href: "https://omokjomok12.vercel.app" }],
     art: "omok",
   },
   {

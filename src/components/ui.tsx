@@ -5,7 +5,7 @@ import type { Award, Deck, Metric, Project, ProjectStatus } from "@/content/type
 import { tx, txv } from "@/content/types";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
-import { ArrowRightIcon, LockIcon } from "./icons";
+import { ArrowRightIcon, ExternalIcon, LockIcon } from "./icons";
 import { ProjectArt } from "./project-art";
 
 export function StatusBadge({ status, dict }: { status: ProjectStatus; dict: Dictionary }) {
@@ -42,29 +42,55 @@ export function SectionHead({
 }
 
 /** 프로젝트 표지 — 이미지가 있으면 이미지, 없으면 그린 표지. 16:9 상자를 채운다. */
-export function ProjectCover({ project, locale, sizes, preload }: { project: Project; locale: Locale; sizes: string; preload?: boolean }) {
+export function ProjectCover({ project, locale, sizes, preload, decorative }: { project: Project; locale: Locale; sizes: string; preload?: boolean; decorative?: boolean }) {
   if (project.cover) {
     return (
       <Image
         src={project.cover.src}
         width={project.cover.width}
         height={project.cover.height}
-        alt={tx(project.cover.alt, locale)}
+        alt={decorative ? "" : tx(project.cover.alt, locale)}
         sizes={sizes}
         preload={preload}
         className="h-full w-full object-cover"
       />
     );
   }
-  if (project.art) return <ProjectArt art={project.art} label={tx(project.name, locale)} />;
+  if (project.art) return <ProjectArt art={project.art} label={decorative ? undefined : tx(project.name, locale)} />;
   return <div className="h-full w-full bg-card-2" aria-hidden="true" />;
+}
+
+/** 배포된 서비스 주소 — links 의 첫 항목. 표시는 도메인만(https:// · 끝 / 없이). */
+export function liveLink(project: Project) {
+  const link = project.links?.[0];
+  return link && { ...link, host: new URL(link.href).host };
+}
+
+/** 카드 · 목록 안에서 쓰는 서비스 바로가기 — 카드 전체 링크 위에 올라와 따로 눌린다. */
+export function LiveLink({ project, locale, className = "" }: { project: Project; locale: Locale; className?: string }) {
+  const link = liveLink(project);
+  if (!link) return null;
+  return (
+    <a
+      href={link.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${tx(link.label, locale)} — ${link.host}`}
+      className={`relative z-[1] inline-flex min-h-8 items-center gap-1.5 self-start rounded-full border border-line bg-card px-3 text-[12.5px] font-bold text-ink-2 transition-colors hover:border-gold-line hover:text-ink ${className}`}
+    >
+      <span className="dot" aria-hidden="true" />
+      {link.host}
+      <ExternalIcon size={13} />
+    </a>
+  );
 }
 
 export function ProjectCard({ project, locale, dict, headingLevel = 3 }: { project: Project; locale: Locale; dict: Dictionary; headingLevel?: 2 | 3 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
+  // 카드 전체가 상세 링크(제목 링크를 카드 크기로 늘림)이고, 서비스 바로가기만 그 위에서 따로 눌린다 — a 안에 a 를 넣지 않는다.
   return (
-    <Link href={`/${locale}/projects/${project.slug}`} className="tile tile-link group flex h-full flex-col !p-0">
-      <div className="relative aspect-[16/9] overflow-hidden border-b border-line-2 bg-card-2">
+    <article className="tile tile-link group relative flex h-full flex-col !p-0">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-t-[inherit] border-b border-line-2 bg-card-2">
         <div className="h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.03]">
           <ProjectCover project={project} locale={locale} sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw" />
         </div>
@@ -74,14 +100,19 @@ export function ProjectCard({ project, locale, dict, headingLevel = 3 }: { proje
           <StatusBadge status={project.status} dict={dict} />
           {project.period && <span className="caption num">{tx(project.period, locale)}</span>}
         </div>
-        <Heading className="h4 !text-[clamp(21px,2vw,26px)]">{tx(project.name, locale)}</Heading>
+        <Heading className="h4 !text-[clamp(21px,2vw,26px)]">
+          <Link href={`/${locale}/projects/${project.slug}`} className="stretched">
+            {tx(project.name, locale)}
+          </Link>
+        </Heading>
         <p className="mt-2 text-[15.5px] font-semibold leading-relaxed text-muted-2">{tx(project.tagline, locale)}</p>
         <p className="mt-auto pt-5 text-[13.5px] font-semibold text-ink-2">
           <span className="text-muted-2">{dict.projects.role} · </span>
           {tx(project.role, locale)}
         </p>
+        <LiveLink project={project} locale={locale} className="mt-4" />
       </div>
-    </Link>
+    </article>
   );
 }
 

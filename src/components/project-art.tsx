@@ -6,9 +6,9 @@ type Art = NonNullable<Project["art"]>;
  * 이미지가 없는 프로젝트의 표지 — 저장소에 쓸 만한 스크린샷이 없거나 저작권이 불분명할 때
  * 프로젝트 성격을 그린 SVG 를 쓴다(외부 이미지 0, 테마와 무관하게 어두운 판).
  */
-export function ProjectArt({ art, label }: { art: Art; label: string }) {
+export function ProjectArt({ art, label }: { art: Art; label?: string }) {
   return (
-    <svg viewBox="0 0 640 360" role="img" aria-label={label} className="block h-full w-full" preserveAspectRatio="xMidYMid slice">
+    <svg viewBox="0 0 640 360" {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })} className="block h-full w-full" preserveAspectRatio="xMidYMid slice">
       <defs>
         <radialGradient id={`glow-${art}`} cx="50%" cy="0%" r="90%">
           <stop offset="0" stopColor="#f5b841" stopOpacity="0.22" />
